@@ -862,6 +862,21 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
                     <div className={`switch ${offer.visible ? 'active' : ''}`} onClick={() => { const n = [...offers]; n[idx].visible = !offer.visible; setOffers(n); updateOffer({ ...offer, visible: !offer.visible }); }} />
                   </div>
                 </div>
+                {/* Description field for info tooltip */}
+                <div className="mt-3">
+                  <label className="block mb-1 text-white text-xs opacity-70">{t('offerDescription') || 'Description (icône "i")'}</label>
+                  <textarea 
+                    value={offer.description || ''} 
+                    onChange={(e) => { const n = [...offers]; n[idx].description = e.target.value; setOffers(n); }}
+                    onBlur={() => updateOffer(offer)} 
+                    className="w-full px-3 py-2 rounded-lg neon-input text-sm" 
+                    rows={2}
+                    maxLength={150}
+                    placeholder="Description visible au clic sur l'icône i (max 150 car.)"
+                    data-testid={`offer-description-${offer.id}`}
+                  />
+                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{(offer.description || '').length}/150 caractères</p>
+                </div>
               </div>
             ))}
             <form onSubmit={addOffer} className="glass rounded-lg p-4 mt-4">
@@ -869,7 +884,17 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" placeholder={t('offerName')} value={newOffer.name} onChange={e => setNewOffer({ ...newOffer, name: e.target.value })} className="px-3 py-2 rounded-lg neon-input text-sm" required />
                 <input type="number" placeholder={t('price')} value={newOffer.price} onChange={e => setNewOffer({ ...newOffer, price: parseFloat(e.target.value) })} className="px-3 py-2 rounded-lg neon-input text-sm" />
-                <input type="url" placeholder={t('thumbnail')} value={newOffer.thumbnail} onChange={e => setNewOffer({ ...newOffer, thumbnail: e.target.value })} className="px-3 py-2 rounded-lg neon-input text-sm" />
+                <input type="url" placeholder={t('thumbnail')} value={newOffer.thumbnail || ''} onChange={e => setNewOffer({ ...newOffer, thumbnail: e.target.value })} className="px-3 py-2 rounded-lg neon-input text-sm" />
+              </div>
+              <div className="mt-3">
+                <textarea 
+                  placeholder="Description (max 150 car.)" 
+                  value={newOffer.description || ''} 
+                  onChange={e => setNewOffer({ ...newOffer, description: e.target.value })} 
+                  className="w-full px-3 py-2 rounded-lg neon-input text-sm" 
+                  rows={2}
+                  maxLength={150}
+                />
               </div>
               <button type="submit" className="btn-primary px-4 py-2 rounded-lg mt-4 text-sm">{t('add')}</button>
             </form>
