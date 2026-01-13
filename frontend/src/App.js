@@ -1321,9 +1321,9 @@ function App() {
 
   const resetForm = () => {
     setPendingReservation(null); setSelectedCourse(null); setSelectedDate(null);
-    setSelectedOffer(null); setSelectedSession(null); setIsExistingUser(false);
-    setSelectedUserId(""); setUserName(""); setUserEmail(""); setUserWhatsapp("");
-    setDiscountCode(""); setHasAcceptedTerms(false); setAppliedDiscount(null);
+    setSelectedOffer(null); setSelectedSession(null); setUserName(""); 
+    setUserEmail(""); setUserWhatsapp(""); setDiscountCode(""); 
+    setHasAcceptedTerms(false); setAppliedDiscount(null);
   };
 
   const sendWhatsAppNotification = (reservation, isCoach) => {
