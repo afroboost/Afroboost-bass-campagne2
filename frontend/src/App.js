@@ -410,6 +410,9 @@ const MediaDisplay = ({ url, className }) => {
   // Return null if no valid media URL
   if (!media || !url || url.trim() === '') return null;
 
+  // Detect mobile for responsive overlay
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   // 16:9 container wrapper
   const containerStyle = {
     position: 'relative',
@@ -443,27 +446,31 @@ const MediaDisplay = ({ url, className }) => {
     pointerEvents: 'auto'
   };
 
-  // Top bar overlay to completely hide YouTube title/logo
+  // Top bar overlay - REDUCED on mobile for better visibility
   const topBarOverlayStyle = {
     position: 'absolute',
     top: 0,
     left: 0,
     width: '100%',
-    height: '80px',
+    height: isMobile ? '30px' : '80px', // Smaller on mobile
     zIndex: 15,
-    background: 'linear-gradient(180deg, #000000 0%, #000000 50%, rgba(0,0,0,0.8) 80%, transparent 100%)',
+    background: isMobile 
+      ? 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%)'
+      : 'linear-gradient(180deg, #000000 0%, #000000 50%, rgba(0,0,0,0.8) 80%, transparent 100%)',
     pointerEvents: 'auto'
   };
 
-  // Bottom bar overlay to completely hide YouTube logo watermark
+  // Bottom bar overlay - REDUCED on mobile for better visibility
   const bottomBarOverlayStyle = {
     position: 'absolute',
     bottom: 0,
     left: 0,
     width: '100%',
-    height: '70px',
+    height: isMobile ? '25px' : '70px', // Smaller on mobile
     zIndex: 15,
-    background: 'linear-gradient(0deg, #000000 0%, #000000 50%, rgba(0,0,0,0.8) 80%, transparent 100%)',
+    background: isMobile 
+      ? 'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%)'
+      : 'linear-gradient(0deg, #000000 0%, #000000 50%, rgba(0,0,0,0.8) 80%, transparent 100%)',
     pointerEvents: 'auto'
   };
 
