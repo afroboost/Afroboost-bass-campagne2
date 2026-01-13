@@ -1157,6 +1157,29 @@ function App() {
     return () => { mounted = false; };
   }, []);
 
+  // Update favicon dynamically when logoUrl changes
+  useEffect(() => {
+    if (concept.logoUrl && concept.logoUrl.trim() !== '') {
+      // Update favicon
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = concept.logoUrl;
+      
+      // Update apple-touch-icon
+      let appleLink = document.querySelector("link[rel='apple-touch-icon']");
+      if (!appleLink) {
+        appleLink = document.createElement('link');
+        appleLink.rel = 'apple-touch-icon';
+        document.head.appendChild(appleLink);
+      }
+      appleLink.href = concept.logoUrl;
+    }
+  }, [concept.logoUrl]);
+
   useEffect(() => { const timer = setTimeout(() => setShowSplash(false), 1500); return () => clearTimeout(timer); }, []);
 
   // Validate discount code in real-time
