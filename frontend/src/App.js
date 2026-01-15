@@ -3687,6 +3687,35 @@ function App() {
           </div>
         )}
 
+        {/* Bouton Voir les avis Google - affiché si configuré par le coach */}
+        {selectedOffer && concept.googleReviewsUrl && (
+          <div className="mb-6 flex justify-center">
+            <a 
+              href={concept.googleReviewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
+              style={{
+                background: 'transparent',
+                border: '2px solid rgba(217, 28, 210, 0.7)',
+                boxShadow: '0 0 15px rgba(217, 28, 210, 0.4), inset 0 0 10px rgba(139, 92, 246, 0.1)',
+                color: '#fff'
+              }}
+              data-testid="google-reviews-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span className="font-medium">Voir les avis</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
+        )}
+
         {selectedOffer && (
           <form onSubmit={handleSubmit}>
             <div className="form-section rounded-xl p-6 mb-6">
