@@ -1621,11 +1621,15 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
 
   const saveConcept = async () => { 
     try {
-      await axios.put(`${API}/concept`, concept); 
+      console.log("Saving concept:", concept);
+      const response = await axios.put(`${API}/concept`, concept); 
+      console.log("Concept saved successfully:", response.data);
       alert("✅ Concept sauvegardé avec succès !");
     } catch (err) {
       console.error("Error saving concept:", err);
-      alert("❌ Erreur lors de la sauvegarde");
+      console.error("Error details:", err.response?.data || err.message);
+      const errorMessage = err.response?.data?.detail || err.message || "Erreur inconnue";
+      alert(`❌ Erreur lors de la sauvegarde: ${errorMessage}`);
     }
   };
   const savePayments = async () => { await axios.put(`${API}/payment-links`, paymentLinks); alert("Saved!"); };
