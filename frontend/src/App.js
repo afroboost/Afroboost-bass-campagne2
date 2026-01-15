@@ -1878,11 +1878,93 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
             ))}
             <form onSubmit={addOffer} className="glass rounded-lg p-4 mt-4">
               <h3 className="text-white mb-4 font-semibold text-sm">{t('addOffer')}</h3>
+              
+              {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" placeholder={t('offerName')} value={newOffer.name} onChange={e => setNewOffer({ ...newOffer, name: e.target.value })} className="px-3 py-2 rounded-lg neon-input text-sm" required />
                 <input type="number" placeholder={t('price')} value={newOffer.price} onChange={e => setNewOffer({ ...newOffer, price: parseFloat(e.target.value) })} className="px-3 py-2 rounded-lg neon-input text-sm" />
                 <input type="url" placeholder={t('thumbnail')} value={newOffer.thumbnail || ''} onChange={e => setNewOffer({ ...newOffer, thumbnail: e.target.value })} className="px-3 py-2 rounded-lg neon-input text-sm" />
               </div>
+              
+              {/* Category & Type */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                <select 
+                  value={newOffer.category} 
+                  onChange={e => setNewOffer({ ...newOffer, category: e.target.value })}
+                  className="px-3 py-2 rounded-lg neon-input text-sm"
+                >
+                  <option value="service">🎧 Service / Cours</option>
+                  <option value="tshirt">👕 T-shirt</option>
+                  <option value="shoes">👟 Chaussures</option>
+                  <option value="supplement">💊 Complément</option>
+                  <option value="accessory">🎒 Accessoire</option>
+                </select>
+                <label className="flex items-center gap-2 text-white text-sm">
+                  <input 
+                    type="checkbox" 
+                    checked={newOffer.isProduct} 
+                    onChange={e => setNewOffer({ ...newOffer, isProduct: e.target.checked })} 
+                  />
+                  Produit physique (expédition)
+                </label>
+              </div>
+              
+              {/* E-Commerce Fields (shown when isProduct) */}
+              {newOffer.isProduct && (
+                <div className="mt-3 p-3 rounded-lg border border-purple-500/30">
+                  <p className="text-xs text-purple-400 mb-3">📦 Paramètres produit</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="text-xs text-white opacity-60">TVA (%)</label>
+                      <input type="number" placeholder="7.7" value={newOffer.tva || ''} onChange={e => setNewOffer({ ...newOffer, tva: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 rounded-lg neon-input text-sm" step="0.1" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white opacity-60">Frais port (CHF)</label>
+                      <input type="number" placeholder="9.90" value={newOffer.shippingCost || ''} onChange={e => setNewOffer({ ...newOffer, shippingCost: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 rounded-lg neon-input text-sm" step="0.1" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white opacity-60">Stock (-1=illimité)</label>
+                      <input type="number" placeholder="-1" value={newOffer.stock} onChange={e => setNewOffer({ ...newOffer, stock: parseInt(e.target.value) || -1 })} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                    </div>
+                  </div>
+                  
+                  {/* Variants */}
+                  <div className="mt-3">
+                    <label className="text-xs text-white opacity-60">Variantes (séparées par virgule)</label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                      <input 
+                        type="text" 
+                        placeholder="Tailles: S, M, L, XL"
+                        onChange={e => setNewOffer({ 
+                          ...newOffer, 
+                          variants: { ...newOffer.variants, sizes: e.target.value.split(',').map(s => s.trim()).filter(s => s) }
+                        })}
+                        className="px-3 py-2 rounded-lg neon-input text-sm"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Couleurs: Noir, Blanc, Rose"
+                        onChange={e => setNewOffer({ 
+                          ...newOffer, 
+                          variants: { ...newOffer.variants, colors: e.target.value.split(',').map(s => s.trim()).filter(s => s) }
+                        })}
+                        className="px-3 py-2 rounded-lg neon-input text-sm"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Poids: 0.5kg, 1kg"
+                        onChange={e => setNewOffer({ 
+                          ...newOffer, 
+                          variants: { ...newOffer.variants, weights: e.target.value.split(',').map(s => s.trim()).filter(s => s) }
+                        })}
+                        className="px-3 py-2 rounded-lg neon-input text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Description */}
               <div className="mt-3">
                 <textarea 
                   placeholder="Description (max 150 car.)" 
