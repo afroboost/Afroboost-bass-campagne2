@@ -1980,21 +1980,40 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
                   <div>
                     <label className="block mb-1 text-white text-xs opacity-70">{t('offerName')}</label>
                     <input type="text" value={offer.name} onChange={(e) => { const n = [...offers]; n[idx].name = e.target.value; setOffers(n); }}
-                      onBlur={() => updateOffer(offer)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                      className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
                   </div>
                   <div>
                     <label className="block mb-1 text-white text-xs opacity-70">{t('price')}</label>
                     <input type="number" value={offer.price} onChange={(e) => { const n = [...offers]; n[idx].price = parseFloat(e.target.value); setOffers(n); }}
-                      onBlur={() => updateOffer(offer)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                      className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
                   </div>
                   <div>
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('thumbnail')}</label>
-                    <input type="url" value={offer.thumbnail || ''} onChange={(e) => { const n = [...offers]; n[idx].thumbnail = e.target.value; setOffers(n); }}
-                      onBlur={() => updateOffer(offer)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" placeholder="https://..." />
+                    <label className="block mb-1 text-white text-xs opacity-70">Images (max 5, séparées par virgule)</label>
+                    <input 
+                      type="text" 
+                      value={offer.images?.join(', ') || offer.thumbnail || ''} 
+                      onChange={(e) => { 
+                        const n = [...offers]; 
+                        const urls = e.target.value.split(',').map(u => u.trim()).filter(u => u).slice(0, 5);
+                        n[idx].images = urls;
+                        n[idx].thumbnail = urls[0] || '';
+                        setOffers(n); 
+                      }}
+                      className="w-full px-3 py-2 rounded-lg neon-input text-sm" 
+                      placeholder="URL1, URL2, URL3..." 
+                    />
                   </div>
                   <div className="flex items-center gap-3">
                     <label className="text-white text-xs opacity-70">{t('visible')}</label>
                     <div className={`switch ${offer.visible ? 'active' : ''}`} onClick={() => { const n = [...offers]; n[idx].visible = !offer.visible; setOffers(n); updateOffer({ ...offer, visible: !offer.visible }); }} />
+                    <button 
+                      type="button"
+                      onClick={() => updateOffer(offer)}
+                      className="btn-primary px-3 py-1 rounded-lg text-xs ml-2"
+                      data-testid={`save-offer-${offer.id}`}
+                    >
+                      💾 Sauver
+                    </button>
                   </div>
                 </div>
                 {/* Description field for info tooltip */}
@@ -2003,7 +2022,6 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
                   <textarea 
                     value={offer.description || ''} 
                     onChange={(e) => { const n = [...offers]; n[idx].description = e.target.value; setOffers(n); }}
-                    onBlur={() => updateOffer(offer)} 
                     className="w-full px-3 py-2 rounded-lg neon-input text-sm" 
                     rows={2}
                     maxLength={150}
