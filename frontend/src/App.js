@@ -1762,6 +1762,14 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
   const [instagramProfile, setInstagramProfile] = useState("afroboost"); // Profil Instagram par défaut
   const [messageCopied, setMessageCopied] = useState(false);
 
+  // === EMAILJS STATE ===
+  const [emailJSConfig, setEmailJSConfig] = useState(() => getEmailJSConfig());
+  const [showEmailJSConfig, setShowEmailJSConfig] = useState(false);
+  const [emailSendingProgress, setEmailSendingProgress] = useState(null); // {current, total, status, name}
+  const [emailSendingResults, setEmailSendingResults] = useState(null); // {sent, failed, errors}
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [testEmailStatus, setTestEmailStatus] = useState(null); // 'sending', 'success', 'error'
+
   // Add schedule slot
   const addScheduleSlot = () => {
     const now = new Date();
