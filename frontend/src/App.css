@@ -148,10 +148,9 @@ html, body {
 .session-btn.selected {
   border: 2px solid #d91cd2 !important;
   box-shadow: 
-    0 0 15px rgba(217, 28, 210, 0.6),
-    0 0 30px rgba(217, 28, 210, 0.3),
-    inset 0 0 20px rgba(217, 28, 210, 0.1);
-  background: linear-gradient(135deg, rgba(217, 28, 210, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+    0 0 8px rgba(217, 28, 210, 0.35),
+    0 0 15px rgba(217, 28, 210, 0.15);
+  background: linear-gradient(135deg, rgba(217, 28, 210, 0.1) 0%, rgba(139, 92, 246, 0.08) 100%);
 }
 
 /* Course Cards with Gradient */
@@ -171,9 +170,8 @@ html, body {
 .course-card.selected {
   border: 2px solid #d91cd2 !important;
   box-shadow: 
-    0 0 25px rgba(217, 28, 210, 0.5),
-    0 0 40px rgba(217, 28, 210, 0.25),
-    inset 0 0 30px rgba(217, 28, 210, 0.08);
+    0 0 10px rgba(217, 28, 210, 0.3),
+    0 0 20px rgba(217, 28, 210, 0.12);
 }
 
 /* =================================================================
@@ -237,12 +235,11 @@ html, body {
 }
 
 .offer-card.selected {
-  border: 3px solid #d91cd2 !important;
-  background: linear-gradient(180deg, rgba(139, 92, 246, 0.15) 0%, rgba(217, 28, 210, 0.1) 100%);
+  border: 2px solid #d91cd2 !important;
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(217, 28, 210, 0.06) 100%);
   box-shadow: 
-    0 0 25px rgba(217, 28, 210, 0.5),
-    0 0 40px rgba(217, 28, 210, 0.25),
-    inset 0 0 30px rgba(217, 28, 210, 0.08);
+    0 0 10px rgba(217, 28, 210, 0.3),
+    0 0 20px rgba(217, 28, 210, 0.12);
   height: auto !important;
   max-height: none !important;
 }
@@ -422,17 +419,17 @@ html, body {
   background: linear-gradient(90deg, #f0abfc, #a78bfa);
 }
 
-/* Offer Card in Slider - LED Neon effect */
+/* Offer Card in Slider - Soft LED effect */
 .offers-slider .offer-card.selected {
-  animation: neonPulse 2s ease-in-out infinite;
+  animation: neonPulseSoft 2.5s ease-in-out infinite;
 }
 
-@keyframes neonPulse {
+@keyframes neonPulseSoft {
   0%, 100% { 
-    box-shadow: 0 0 20px #d91cd2, 0 0 40px rgba(217, 28, 210, 0.5), inset 0 0 20px rgba(217, 28, 210, 0.1);
+    box-shadow: 0 0 8px rgba(217, 28, 210, 0.25), 0 0 16px rgba(217, 28, 210, 0.1);
   }
   50% { 
-    box-shadow: 0 0 30px #d91cd2, 0 0 60px rgba(217, 28, 210, 0.7), inset 0 0 30px rgba(217, 28, 210, 0.2);
+    box-shadow: 0 0 12px rgba(217, 28, 210, 0.35), 0 0 24px rgba(217, 28, 210, 0.15);
   }
 }
 
