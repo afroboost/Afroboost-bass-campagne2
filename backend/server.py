@@ -1192,7 +1192,8 @@ async def chat_with_ai(data: ChatMessage):
             system_message=full_system_prompt
         )
         
-        ai_response = await chat.send_message(message)
+        user_msg = UserMessage(text=message)
+        ai_response = await chat.send_message(user_msg)
         response_time = round(time.time() - start_time, 2)
         
         # Log la conversation
