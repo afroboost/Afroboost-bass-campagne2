@@ -256,6 +256,7 @@ class CampaignCreate(BaseModel):
 class Concept(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = "concept"
+    appName: str = "Afroboost"  # Nom de l'application (titre principal)
     description: str = "Le concept Afroboost : cardio + danse afrobeat + casques audio immersifs. Un entraînement fun, énergétique et accessible à tous."
     heroImageUrl: str = ""
     heroVideoUrl: str = ""
@@ -278,6 +279,7 @@ class Concept(BaseModel):
     eventPosterMediaUrl: str = ""  # URL image ou vidéo
 
 class ConceptUpdate(BaseModel):
+    appName: Optional[str] = None  # Nom de l'application
     description: Optional[str] = None
     heroImageUrl: Optional[str] = None
     heroVideoUrl: Optional[str] = None
