@@ -45,6 +45,11 @@ async def health_check():
             content={"status": "unhealthy", "database": "disconnected", "error": str(e)}
         )
 
+@app.get("/api/health")
+async def api_health_check():
+    """Health check endpoint via /api prefix for Kubernetes"""
+    return await health_check()
+
 # ==================== MODELS ====================
 
 class Course(BaseModel):
