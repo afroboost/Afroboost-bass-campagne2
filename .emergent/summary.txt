@@ -1,0 +1,146 @@
+<analysis>**original_problem_statement:**
+L'utilisateur souhaite créer une application nommée Afroboost pour la réservation de casques audio pour des cours de fitness. Les exigences ont évolué pour inclure un mode coach avancé, un système de code promo, un gestionnaire de campagnes marketing, une IA conversationnelle pour le support client, une migration des données vers MongoDB, et une refonte de l'architecture pour un déploiement sur Vercel.
+
+Les demandes récentes se sont concentrées sur des améliorations significatives de l'expérience utilisateur, notamment :
+- L'ajout d'une barre de navigation avec recherche et filtres.
+- Le raffinement du design de l'interface (style des filtres, réduction des effets glow).
+- La mise en place d'un widget de chat IA flottant avec un formulaire de capture de prospects (nom, email, WhatsApp) qui enregistre les données dans MongoDB.
+- La correction de la visibilité des médias (vidéo d'arrière-plan).
+- L'ajout de champs de configuration pour des liens externes et des méthodes de paiement dans le panneau d'administration, avec affichage dynamique dans le pied de page.
+- L'amélioration du flux de réservation en ajoutant un défilement automatique vers le formulaire d'information après la sélection d'une offre.
+
+**PRODUCT REQUIREMENTS:**
+1.  **Système de Réservation Principal:** Les utilisateurs doivent pouvoir sélectionner un cours, une date, une offre et réserver.
+2.  **Gestionnaire de Campagnes Automatisé:** Le coach doit pouvoir gérer des campagnes marketing avec envoi automatique via EmailJS et une API WhatsApp.
+3.  **Agent IA Flottant avec Capture de Leads:** Une icône flottante ouvre un formulaire pour capturer le prénom, le numéro WhatsApp et l'email de l'utilisateur avant de démarrer une conversation avec une IA. Les données sont sauvegardées dans MongoDB.
+4.  **Mode Coach Avancé:** Un panneau d'administration pour gérer les cours, offres, campagnes, configurations API, l'apparence du site (logo, favicon, liens externes, paiements) et la section d'atterrissage par défaut.
+5.  **Architecture Persistante & Scalable:** L'application utilise MongoDB pour la persistance des données et est structurée pour être maintenable.
+6.  **Navigation Client Améliorée:** Une barre de recherche permet de filtrer les offres par titre. Le défilement automatique guide l'utilisateur à travers les étapes de réservation.
+
+**User's preferred language**: Français
+
+**what currently exists?**
+Une application full-stack fonctionnelle avec un frontend React (principalement dans un fichier monolithique ) et un backend FastAPI. La persistance des données est entièrement gérée via MongoDB (utilisant ). Les fonctionnalités clés comme la réservation, le mode coach, les campagnes marketing et l'agent IA sont implémentées. Les dernières sessions se sont concentrées sur l'ajout de nouvelles fonctionnalités (widget IA, liens externes) et l'amélioration de l'UX (design du footer, scroll automatique, réduction du glow).
+
+**Last working item**:
+-   **Last item agent was working:** Améliorer l'expérience utilisateur du carrousel des offres. L'objectif était d'ajouter un défilement automatique (auto-play) pour montrer que les offres sont multiples et d'ajouter une consigne visuelle claire (👉 Sélectionnez une offre pour continuer) pour inciter au clic.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** frontend testing agent (pour valider l'auto-play, le nouveau texte, et s'assurer qu'il n'y a pas de régression sur la fonctionnalité du carrousel).
+-   **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+-   **Issue 1: Fragilité du Scanner QR (Priorité: P2)**
+    -   **Description:** L'accès à la caméra pour le scanner QR a été un problème récurrent. Bien qu'il soit actuellement fonctionnel, toute modification à proximité de ce code doit être testée avec soin pour éviter une régression.
+    -   **Status:** RESOLVED (Monitoring required)
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** frontend
+
+**In progress Task List**:
+-   **Task 1: Amélioration UX du Carrousel des Offres (Priorité: P0)**
+    -   **Where to resume:** Le travail a commencé dans  en créant un nouveau composant . La prochaine étape consiste à intégrer ce composant dans , à finaliser la logique de défilement automatique avec , et à ajouter le texte d'instruction.
+    -   **What will be achieved with this?** Améliorer la découvrabilité des offres et guider l'utilisateur pour réduire les frictions dans le parcours de réservation.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on something:** Non.
+
+**Upcoming and Future Tasks**
+-   **P0: Finaliser le Refactoring de :** Extraire la logique restante (gestion d'état, formulaire principal) dans des hooks et des composants dédiés. C'est la dette technique la plus critique.
+-   **P1: Optimisation des requêtes Backend:** Appliquer les recommandations du rapport de déploiement pour optimiser 4 requêtes MongoDB dans  qui pourraient affecter les performances en production (pas de pagination/projection sur de grandes collections).
+-   **P1: Créer des pages dédiées:** Utiliser un routeur (ex: React Router) pour créer des pages distinctes comme  et .
+-   **P2: Dashboard Analytics pour le Coach:** Créer une nouvelle vue dans le mode coach pour afficher des statistiques sur les réservations, les revenus et la performance des campagnes.
+-   **P3: Migration des données initiales du localStorage:** Créer un script de migration unique si nécessaire pour d'anciennes données utilisateurs stockées localement.
+
+**Completed work in this session**
+-   **Widget IA avec Capture de Données:** Ajout d'un widget flottant WhatsApp qui ouvre un formulaire de capture de leads (prénom, email, WhatsApp) avant de lancer le chat. Les données sont sauvegardées dans une nouvelle collection  sur MongoDB.
+-   **Amélioration du flux de réservation:** Implémentation d'un défilement automatique (smooth scroll) vers le formulaire d'informations utilisateur dès qu'une offre est sélectionnée.
+-   **Refonte du Footer:** Création d'une ligne de navigation textuelle minimaliste et horizontale ([Lien 1] | [Lien 2] | [Installer]) et affichage des logos de paiement sans texte ni cadre.
+-   **Configuration des Liens et Paiements:** Ajout de champs dans le mode coach pour gérer les liens externes et les méthodes de paiement (avec des interrupteurs), qui sont ensuite affichés dynamiquement côté client.
+-   **Masquage des Filtres de Navigation:** Les boutons de filtre (Tout, Sessions, Offres, Shop) ont été masqués de l'interface client, ne laissant que la barre de recherche.
+-   **Optimisation Visuelle:** Réduction de l'intensité de l'effet glow rose sur les cartes sélectionnées pour un rendu plus doux, et suppression des superpositions sombres sur la vidéo de fond pour une meilleure visibilité.
+-   **Rapport de Déploiement:** L'application a été jugée prête pour le déploiement avec des recommandations d'optimisation non bloquantes pour le backend.
+
+**Earlier issues found/mentioned but not fixed**
+Aucun.
+
+**Known issue recurrence from previous fork**
+-   **Issue recurrence in previous fork:** Échec de l'accès à la caméra du scanner QR.
+-   **Recurrence count:** Élevé.
+-   **Status:** RESOLVED (mais à surveiller attentivement).
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Frontend:** React, /, TailwindCSS, CSS direct dans .
+-   **Backend:** FastAPI (Python), MongoDB avec .
+-   **Persistence:** MongoDB.
+-   **Integrations:** EmailJS, Twilio (WhatsApp API), OpenAI ().
+-   **Architecture:** Monolithe  en cours de refactoring progressif.
+
+**key DB schema**
+-   : (NOUVEAU) 
+-   : (ÉTENDU) Ajout de , , , , .
+
+**All files of reference**
+-   : Fichier principal, massivement modifié.
+-   : Modifié pour ajouter la collection  et les nouveaux champs .
+-   : Nouveau fichier pour le widget IA.
+-   : Fichier modifié pour la logique de carrousel.
+-   : Modifié pour ajuster les styles visuels.
+-   : Mis à jour à chaque fin de tâche.
+
+**Areas that need refactoring**:
+-   **CRITICAL:** Le fichier  est la principale source de dette technique (>5500 lignes). Son refactoring en composants et hooks plus petits est la tâche P0 la plus importante pour la maintenabilité du projet.
+-   **MODERATE:** Les requêtes backend identifiées par l'agent de déploiement dans  devraient être optimisées (pagination, projection) avant une montée en charge.
+
+**key api endpoints**
+-    (POST): Nouvel endpoint pour sauvegarder les données des prospects depuis le widget IA.
+-    (POST): Nouvel endpoint pour gérer les conversations avec l'assistant IA.
+
+**Critical Info for New Agent**
+-   **Toute communication doit être en français.**
+-   **Règles de sécurité strictes:** Ne pas toucher au Splash Screen, aux fichiers PWA (), à la logique de paiement Stripe, ni supprimer le carrousel horizontal des offres.
+-   La priorité immédiate est de terminer l'amélioration de l'UX du carrousel des offres.
+-   La priorité de fond reste le **refactoring de **.
+
+**documents and test reports created in this job**
+-    (mis à jour continuellement)
+-    (rapport de test pour la fonctionnalité de navigation)
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **Utilisateur (dernière instruction):** Demande d'améliorer l'UX du carrousel des offres avec un auto-play, une consigne visuelle et en s'assurant que la carte est cliquable et que le scroll automatique fonctionne.
+2.  **Agent:** Résumé de l'implémentation réussie du scroll automatique.
+3.  **Utilisateur:** Demande d'ajouter un défilement automatique (smooth scroll) vers le formulaire d'information dès qu'une offre est cliquée, car les utilisateurs sont bloqués.
+4.  **Agent:** Présente le rapport du .
+5.  **Utilisateur:** Demande de lancer le  pour vérifier la préparation au déploiement.
+6.  **Agent:** Résume les ajustements de style effectués sur le glow.
+7.  **Agent:** Modifie les styles CSS pour réduire l'effet glow.
+8.  **Utilisateur:** 
+9.  **Agent:** Confirme la compréhension des règles de sécurité et demande s'il doit procéder à la réduction du glow.
+10. **Utilisateur:** Énonce des règles de sécurité strictes à ne jamais enfreindre et demande de réduire l'intensité du glow rose sur les cartes sélectionnées.
+
+**Project Health Check:**
+-   **Broken:** Le monolithe  est une dette technique majeure qui rend la maintenance complexe et risquée.
+-   **Mocked:** Aucune. L'application est entièrement fonctionnelle avec un backend MongoDB persistant.
+
+**3rd Party Integrations**
+-   **EmailJS ():** Envoi d'emails de campagne.
+-   **Twilio API (via ):** Envoi de messages WhatsApp.
+-   **OpenAI ():** Alimente l'agent IA conversationnel (utilise la clé ).
+-   **qrcode.react:** Génération de QR codes.
+-   **html5-qrcode:** Scanner de QR codes.
+
+**Testing status**
+-   **Testing agent used after significant changes:** YES (pour la fonctionnalité de navigation).
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** []
+-   **Known regressions:** Le scanner QR est une fonctionnalité fragile qui nécessite une surveillance particulière.
+
+**Credentials to test flow:**
+-   **Accès Coach:** 3 clics rapides sur le texte de copyright en pied de page.
+    -   Email: 
+    -   Mot de passe: 
+
+**What agent forgot to execute**
+L'agent a été très réactif aux demandes de l'utilisateur en ajoutant de nombreuses fonctionnalités. Cependant, le refactoring majeur de , bien qu'identifié comme une priorité P0, n'a pas été traité de manière proactive. De même, les optimisations de base de données suggérées par l'agent de déploiement n'ont pas encore été implémentées.</analysis>
