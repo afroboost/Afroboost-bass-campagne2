@@ -1849,55 +1849,77 @@ const CoachDashboard = ({ t, lang, onBack, onLogout }) => {
         {tab === "courses" && (
           <div className="card-gradient rounded-xl p-6">
             <h2 className="font-semibold text-white mb-6" style={{ fontSize: '20px' }}>{t('courses')}</h2>
-            {courses.map((course, idx) => (
-              <div key={course.id} className="glass rounded-lg p-4 mb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('courseName')}</label>
-                    <input type="text" value={course.name} onChange={(e) => { const n = [...courses]; n[idx].name = e.target.value; setCourses(n); }}
-                      onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('location')}</label>
-                    <input type="text" value={course.locationName} onChange={(e) => { const n = [...courses]; n[idx].locationName = e.target.value; setCourses(n); }}
-                      onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('weekday')}</label>
-                    <select value={course.weekday} onChange={(e) => { const n = [...courses]; n[idx].weekday = parseInt(e.target.value); setCourses(n); updateCourse({ ...course, weekday: parseInt(e.target.value) }); }}
-                      className="w-full px-3 py-2 rounded-lg neon-input text-sm">
-                      {WEEKDAYS_MAP[lang].map((d, i) => <option key={i} value={i}>{d}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('time')}</label>
-                    <input type="time" value={course.time} onChange={(e) => { const n = [...courses]; n[idx].time = e.target.value; setCourses(n); }}
-                      onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block mb-1 text-white text-xs opacity-70">{t('mapsLink')}</label>
-                    <input type="url" value={course.mapsUrl || ''} onChange={(e) => { const n = [...courses]; n[idx].mapsUrl = e.target.value; setCourses(n); }}
-                      onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" placeholder="https://maps.google.com/..." />
-                  </div>
-                  {/* Toggle visibilité du cours */}
-                  <div className="flex items-center gap-3 mt-2">
-                    <label className="text-white text-xs opacity-70">{t('visible')}</label>
-                    <div className={`switch ${course.visible !== false ? 'active' : ''}`} 
-                      onClick={() => { 
-                        const n = [...courses]; 
-                        n[idx].visible = course.visible === false ? true : false; 
-                        setCourses(n); 
-                        updateCourse({ ...course, visible: n[idx].visible }); 
-                      }} 
-                      data-testid={`course-visible-${course.id}`}
-                    />
-                    <span className="text-white text-xs opacity-50">
-                      {course.visible !== false ? '👁️ Visible' : '🚫 Masqué'}
-                    </span>
+            {/* Liste des cours avec scroll */}
+            <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }} className="custom-scrollbar">
+              {courses.map((course, idx) => (
+                <div key={course.id} className="glass rounded-lg p-4 mb-4 relative">
+                  {/* Bouton supprimer */}
+                  <button 
+                    onClick={async () => {
+                      if (window.confirm(`Supprimer le cours "${course.name}" ?`)) {
+                        try {
+                          await axios.delete(`${API}/courses/${course.id}`);
+                          setCourses(courses.filter(c => c.id !== course.id));
+                        } catch (err) {
+                          console.error("Erreur suppression cours:", err);
+                        }
+                      }
+                    }}
+                    className="absolute top-2 right-2 p-2 rounded-lg hover:bg-red-500/30 transition-colors"
+                    style={{ color: 'rgba(239, 68, 68, 0.8)' }}
+                    title="Supprimer ce cours"
+                    data-testid={`delete-course-${course.id}`}
+                  >
+                    <TrashIcon />
+                  </button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-8">
+                    <div>
+                      <label className="block mb-1 text-white text-xs opacity-70">{t('courseName')}</label>
+                      <input type="text" value={course.name} onChange={(e) => { const n = [...courses]; n[idx].name = e.target.value; setCourses(n); }}
+                        onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                    </div>
+                    <div>
+                      <label className="block mb-1 text-white text-xs opacity-70">{t('location')}</label>
+                      <input type="text" value={course.locationName} onChange={(e) => { const n = [...courses]; n[idx].locationName = e.target.value; setCourses(n); }}
+                        onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                    </div>
+                    <div>
+                      <label className="block mb-1 text-white text-xs opacity-70">{t('weekday')}</label>
+                      <select value={course.weekday} onChange={(e) => { const n = [...courses]; n[idx].weekday = parseInt(e.target.value); setCourses(n); updateCourse({ ...course, weekday: parseInt(e.target.value) }); }}
+                        className="w-full px-3 py-2 rounded-lg neon-input text-sm">
+                        {WEEKDAYS_MAP[lang].map((d, i) => <option key={i} value={i}>{d}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block mb-1 text-white text-xs opacity-70">{t('time')}</label>
+                      <input type="time" value={course.time} onChange={(e) => { const n = [...courses]; n[idx].time = e.target.value; setCourses(n); }}
+                        onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block mb-1 text-white text-xs opacity-70">{t('mapsLink')}</label>
+                      <input type="url" value={course.mapsUrl || ''} onChange={(e) => { const n = [...courses]; n[idx].mapsUrl = e.target.value; setCourses(n); }}
+                        onBlur={() => updateCourse(course)} className="w-full px-3 py-2 rounded-lg neon-input text-sm" placeholder="https://maps.google.com/..." />
+                    </div>
+                    {/* Toggle visibilité du cours */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <label className="text-white text-xs opacity-70">{t('visible')}</label>
+                      <div className={`switch ${course.visible !== false ? 'active' : ''}`} 
+                        onClick={() => { 
+                          const n = [...courses]; 
+                          n[idx].visible = course.visible === false ? true : false; 
+                          setCourses(n); 
+                          updateCourse({ ...course, visible: n[idx].visible }); 
+                        }} 
+                        data-testid={`course-visible-${course.id}`}
+                      />
+                      <span className="text-white text-xs opacity-50">
+                        {course.visible !== false ? '👁️ Visible' : '🚫 Masqué'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <form onSubmit={addCourse} className="glass rounded-lg p-4 mt-4">
               <h3 className="text-white mb-4 font-semibold text-sm">{t('addCourse')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
