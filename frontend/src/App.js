@@ -598,7 +598,6 @@ const MediaDisplay = ({ url, className }) => {
   };
 
   // Couche transparente COMPLÈTE pour bloquer TOUS les clics vers YouTube
-  // Laisse seulement le coin bas-droite pour le bouton mute
   const fullBlockerStyle = {
     position: 'absolute',
     top: 0,
@@ -607,7 +606,8 @@ const MediaDisplay = ({ url, className }) => {
     height: '100%',
     zIndex: 50,
     cursor: 'default',
-    background: 'transparent'
+    background: 'transparent',
+    pointerEvents: 'auto'  // IMPORTANT: Capture tous les clics
   };
 
   if (hasError) {
