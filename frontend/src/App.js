@@ -624,26 +624,44 @@ const MediaDisplay = ({ url, className }) => {
     // YouTube embed - with mute control via URL parameter
     const muteParam = isMuted ? '1' : '0';
     return (
-      <div className={className} style={containerStyle} data-testid="media-container-16-9">
-        <iframe 
-          ref={iframeRef}
-          src={`https://www.youtube.com/embed/${media.id}?autoplay=1&mute=${muteParam}&loop=1&playlist=${media.id}&modestbranding=1&rel=0&showinfo=0&controls=0&disablekb=1&fs=0&iv_load_policy=3`}
-          frameBorder="0" 
-          allow="autoplay; encrypted-media" 
-          style={contentStyle}
-          title="YouTube video"
-          onError={() => setHasError(true)}
-        />
-        <div style={clickBlockerStyle} onClick={(e) => e.preventDefault()} />
-        <button 
-          onClick={toggleMute} 
-          style={muteButtonStyle}
-          title={isMuted ? 'Activer le son' : 'Couper le son'}
-          data-testid="mute-btn"
-        >
-          {isMuted ? '🔇' : '🔊'}
-          {showSoundPrompt && isMuted && <span style={{ fontSize: '12px', fontWeight: '500' }}>Son</span>}
-        </button>
+      <div className={className}>
+        <div style={containerStyle} data-testid="media-container-16-9">
+          <iframe 
+            ref={iframeRef}
+            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&mute=${muteParam}&loop=1&playlist=${media.id}&modestbranding=1&rel=0&showinfo=0&controls=0&disablekb=1&fs=0&iv_load_policy=3`}
+            frameBorder="0" 
+            allow="autoplay; encrypted-media" 
+            style={contentStyle}
+            title="YouTube video"
+            onError={() => setHasError(true)}
+          />
+          <div style={clickBlockerStyle} onClick={(e) => e.preventDefault()} />
+        </div>
+        {/* Bouton Mute SOUS la vidéo pour YouTube */}
+        <div className="flex justify-center mt-3">
+          <button 
+            onClick={toggleMute} 
+            style={{
+              padding: '10px 24px',
+              borderRadius: '25px',
+              background: isMuted ? 'linear-gradient(135deg, #d91cd2 0%, #8b5cf6 100%)' : 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(217, 28, 210, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              color: '#fff',
+              fontSize: '14px',
+              fontWeight: '500',
+              boxShadow: isMuted ? '0 0 15px rgba(217, 28, 210, 0.4)' : 'none'
+            }}
+            data-testid="mute-btn"
+          >
+            {isMuted ? '🔇 Activer le son' : '🔊 Son activé'}
+          </button>
+        </div>
       </div>
     );
   }
