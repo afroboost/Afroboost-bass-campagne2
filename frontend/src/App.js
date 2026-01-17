@@ -3107,6 +3107,82 @@ function App() {
                   </div>
                 )}
                 
+                {/* Sélecteur de variantes interactif - Affiché si le produit a des variantes */}
+                {selectedOffer?.variants && Object.keys(selectedOffer.variants).length > 0 && (
+                  <div className="border border-pink-500/30 rounded-lg p-4 bg-pink-900/10" data-testid="variants-selector">
+                    <p className="text-xs text-pink-400 mb-3 font-medium">🎨 Sélectionnez vos options</p>
+                    
+                    {/* Tailles */}
+                    {selectedOffer.variants.sizes && selectedOffer.variants.sizes.length > 0 && (
+                      <div className="mb-4">
+                        <p className="variant-label">Taille</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedOffer.variants.sizes.map((size) => (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={() => setSelectedVariants(prev => ({ ...prev, size }))}
+                              className={`variant-chip ${selectedVariants.size === size ? 'selected' : ''}`}
+                              data-testid={`variant-size-${size}`}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                        {!selectedVariants.size && (
+                          <p className="text-xs text-red-400 mt-1">* Veuillez sélectionner une taille</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Couleurs */}
+                    {selectedOffer.variants.colors && selectedOffer.variants.colors.length > 0 && (
+                      <div className="mb-4">
+                        <p className="variant-label">Couleur</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedOffer.variants.colors.map((color) => (
+                            <button
+                              key={color}
+                              type="button"
+                              onClick={() => setSelectedVariants(prev => ({ ...prev, color }))}
+                              className={`variant-chip ${selectedVariants.color === color ? 'selected' : ''}`}
+                              data-testid={`variant-color-${color}`}
+                            >
+                              {color}
+                            </button>
+                          ))}
+                        </div>
+                        {!selectedVariants.color && (
+                          <p className="text-xs text-red-400 mt-1">* Veuillez sélectionner une couleur</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Autres variantes (poids, etc.) */}
+                    {selectedOffer.variants.weights && selectedOffer.variants.weights.length > 0 && (
+                      <div className="mb-2">
+                        <p className="variant-label">Poids</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedOffer.variants.weights.map((weight) => (
+                            <button
+                              key={weight}
+                              type="button"
+                              onClick={() => setSelectedVariants(prev => ({ ...prev, weight }))}
+                              className={`variant-chip ${selectedVariants.weight === weight ? 'selected' : ''}`}
+                              data-testid={`variant-weight-${weight}`}
+                            >
+                              {weight}
+                            </button>
+                          ))}
+                        </div>
+                        {!selectedVariants.weight && (
+                          <p className="text-xs text-red-400 mt-1">* Veuillez sélectionner un poids</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 {/* Promo code input - Accept any case (minuscules/majuscules) */}
                 <div>
                   <input type="text" placeholder={t('promoCode')} value={discountCode} onChange={e => setDiscountCode(e.target.value)}
