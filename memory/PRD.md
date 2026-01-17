@@ -383,11 +383,21 @@ Application de réservation de casques audio pour des cours de fitness Afroboost
   - **Rafraîchissement automatique** : Liste mise à jour immédiatement après création
   - **Gestion individuelle** : Chaque code reste modifiable/activable/supprimable individuellement
   - **Tests complets** : 12/12 tests backend + 10/10 fonctionnalités frontend vérifiées
+- [x] **Export CSV des Codes Promo (17 Jan 2026)**:
+  - **Bouton "📥 Exporter CSV"** : Ajouté à côté du bouton "Importer CSV" avec fond violet
+  - **Format de fichier** : CSV avec colonnes (Code, Type, Valeur, Bénéficiaire, Utilisations Max, Utilisé, Date Expiration, Actif, Cours Autorisés)
+  - **Encodage UTF-8 BOM** : Pour compatibilité Excel
+  - **Nom automatique** : `codes_promo_YYYY-MM-DD.csv`
+- [x] **Refactoring Majeur App.js (17 Jan 2026)**:
+  - **Extraction CoachDashboard** : Composant de 3383 lignes extrait dans `/components/CoachDashboard.js`
+  - **Réduction App.js** : De 6402 lignes à 3055 lignes (réduction de 52%)
+  - **Imports mis à jour** : `import { CoachDashboard } from "./components/CoachDashboard"`
+  - **Fonctionnalité préservée** : Tous les onglets et fonctions du Mode Coach fonctionnent
 
 ### P1 - À faire
-- [ ] **CRITICAL: Refactoring de App.js** - Le fichier monolithique dépasse 5500 lignes. Extraire la logique restante dans des hooks et composants dédiés.
+- [x] ~~**CRITICAL: Refactoring de App.js**~~ - ✅ COMPLÉTÉ - App.js réduit de 52%
 - [ ] **Optimisation Backend MongoDB** - Appliquer pagination et projection sur les requêtes pour améliorer les performances en production.
-- [ ] Continuer refactoring: Extraire CoachDashboard, CoachLoginModal dans composants séparés
+- [ ] Continuer refactoring: Extraire CoachLoginModal dans composant séparé
 - [ ] Tests automatisés pour les composants extraits
 
 ### P2 - Backlog
