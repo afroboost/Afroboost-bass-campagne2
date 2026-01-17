@@ -8,6 +8,7 @@ import {
   getEmailJSConfig, 
   saveEmailJSConfig, 
   isEmailJSConfigured, 
+  sendEmail,
   sendBulkEmails,
   testEmailJSConfig 
 } from "./services/emailService";
@@ -15,6 +16,7 @@ import {
   getWhatsAppConfig,
   saveWhatsAppConfig,
   isWhatsAppConfigured,
+  sendWhatsAppMessage,
   sendBulkWhatsApp,
   testWhatsAppConfig
 } from "./services/whatsappService";
