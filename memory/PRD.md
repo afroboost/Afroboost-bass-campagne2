@@ -426,11 +426,23 @@ Application de réservation de casques audio pour des cours de fitness Afroboost
   - **Scroll** : maxHeight 400px avec overflow-y auto et scrollbar personnalisée
   - **Bouton supprimer** : Icône poubelle rouge pour chaque cours avec confirmation
   - **Amélioration UX** : Interface plus propre avec padding ajusté
+- [x] **Scroll Sessions Côté Client (17 Jan 2026)**:
+  - **maxHeight 400px** : Appliqué à la liste des sessions sur la page d'accueil
+  - **Custom scrollbar** : Barre de défilement violet cohérente avec le design
+  - **Mobile-friendly** : Meilleure expérience sur petits écrans
+- [x] **Séparation Visibilité Cours/Produits (17 Jan 2026)**:
+  - **Bug corrigé** : Les produits physiques restent visibles même si les cours sont masqués
+  - **Logique indépendante** : `isProduct: true` n'est plus impacté par la visibilité des cours
+- [x] **Fonction Duplication Cours (17 Jan 2026)**:
+  - **Bouton duplication** : Icône violet à côté du bouton supprimer
+  - **Copie automatique** : Crée un nouveau cours avec "(copie)" dans le nom
+  - **Gain de temps** : Permet de créer rapidement des créneaux similaires (ex: mardi ET jeudi)
 
 ### P1 - À faire
 - [x] ~~**CRITICAL: Refactoring de App.js**~~ - ✅ COMPLÉTÉ - App.js réduit de 52%
 - [x] ~~**Notifications email après réservation**~~ - ✅ COMPLÉTÉ
 - [x] ~~**Recherche floue**~~ - ✅ COMPLÉTÉ
+- [x] ~~**Duplication cours**~~ - ✅ COMPLÉTÉ
 - [ ] **Optimisation Backend MongoDB** - Appliquer pagination et projection sur les requêtes pour améliorer les performances en production.
 - [ ] Continuer refactoring: Extraire CoachLoginModal dans composant séparé
 - [ ] Tests automatisés pour les composants extraits
