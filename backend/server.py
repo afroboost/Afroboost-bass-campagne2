@@ -503,6 +503,28 @@ async def get_user(user_id: str):
         user['createdAt'] = datetime.fromisoformat(user['createdAt'].replace('Z', '+00:00'))
     return user
 
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str):
+    """Supprime un utilisateur/contact et nettoie les références dans les codes promo"""
+    # 1. Récupérer l'email de l'utilisateur avant suppression
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_email = user.get("email")
+    
+    # 2. Supprimer l'utilisateur
+    await db.users.delete_one({"id": user_id})
+    
+    # 3. Nettoyer les références dans les codes promo (retirer l'email des assignedEmail)
+    if user_email:
+        await db.discount_codes.update_many(
+            {"assignedEmail": user_email},
+            {"$set": {"assignedEmail": None}}
+        )
+    
+    return {"success": True, "message": "Contact supprimé et références nettoyées"}
+
 # --- Reservations ---
 @api_router.get("/reservations", response_model=List[Reservation])
 async def get_reservations():
