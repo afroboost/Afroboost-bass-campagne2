@@ -519,6 +519,15 @@ Application de réservation de casques audio pour des cours de fitness Afroboost
   - **Frontend service** : `/services/serviceAccess.js` avec cache et helpers
   - **Collections MongoDB** : `feature_flags`, `coach_subscriptions`
   - **Interface inchangée** : Aucune modification visuelle du site
+- [x] **Authentification Google OAuth pour Super Admin (18 Jan 2026)**:
+  - **Remplacement complet** : L'authentification par mot de passe a été supprimée
+  - **Bouton Google officiel** : "Se connecter avec Google" avec icône multicolore
+  - **Restriction email** : Seul `coach@afroboost.com` peut accéder (variable `AUTHORIZED_COACH_EMAIL`)
+  - **Message "Accès réservé"** : Si autre email tente de se connecter
+  - **Endpoints backend** : `/api/auth/google/session`, `/api/auth/me`, `/api/auth/logout`
+  - **Session sécurisée** : Cookie httpOnly avec expiration 7 jours
+  - **Collections MongoDB** : `google_users`, `coach_sessions`
+  - **Affichage utilisateur** : Avatar et email affichés dans le header du Dashboard
 
 ### P1 - À faire
 - [x] ~~**CRITICAL: Refactoring de App.js**~~ - ✅ COMPLÉTÉ - App.js réduit de 52%
