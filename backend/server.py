@@ -341,6 +341,65 @@ class AppConfig(BaseModel):
     user_info_text: str = "Vos informations"
     button_text: str = "Réserver maintenant"
 
+# ==================== FEATURE FLAGS - Services Additionnels ====================
+# Business Model: Super Admin contrôle les feature flags globaux
+# Les Coachs doivent avoir l'abonnement correspondant pour accéder aux services
+
+class FeatureFlags(BaseModel):
+    """
+    Configuration globale des services (contrôlée par Super Admin)
+    Par défaut, tous les services additionnels sont désactivés
+    """
+    model_config = ConfigDict(extra="ignore")
+    id: str = "feature_flags"
+    # Service Audio - Interrupteur général
+    AUDIO_SERVICE_ENABLED: bool = False
+    # Futurs services (préparation)
+    VIDEO_SERVICE_ENABLED: bool = False
+    STREAMING_SERVICE_ENABLED: bool = False
+    # Timestamp de dernière modification
+    updatedAt: Optional[str] = None
+    updatedBy: Optional[str] = None  # "super_admin" ou email
+
+class FeatureFlagsUpdate(BaseModel):
+    """Mise à jour partielle des feature flags"""
+    AUDIO_SERVICE_ENABLED: Optional[bool] = None
+    VIDEO_SERVICE_ENABLED: Optional[bool] = None
+    STREAMING_SERVICE_ENABLED: Optional[bool] = None
+
+# ==================== COACH SUBSCRIPTION - Droits d'accès aux services ====================
+# Business Model: Chaque coach a un profil d'abonnement qui définit ses droits
+
+class CoachSubscription(BaseModel):
+    """
+    Profil d'abonnement d'un coach - définit les services auxquels il a accès
+    Relation: coach_auth.email -> coach_subscription.coachEmail
+    """
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    coachEmail: str  # Email du coach (clé de liaison avec coach_auth)
+    # Services disponibles selon l'abonnement
+    hasAudioService: bool = False  # Accès au service Audio
+    hasVideoService: bool = False  # Futur: service Vidéo
+    hasStreamingService: bool = False  # Futur: service Streaming
+    # Informations d'abonnement
+    subscriptionPlan: str = "free"  # "free", "basic", "premium", "enterprise"
+    subscriptionStartDate: Optional[str] = None
+    subscriptionEndDate: Optional[str] = None
+    isActive: bool = True
+    # Métadonnées
+    createdAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updatedAt: Optional[str] = None
+
+class CoachSubscriptionUpdate(BaseModel):
+    """Mise à jour partielle de l'abonnement coach"""
+    hasAudioService: Optional[bool] = None
+    hasVideoService: Optional[bool] = None
+    hasStreamingService: Optional[bool] = None
+    subscriptionPlan: Optional[str] = None
+    subscriptionEndDate: Optional[str] = None
+    isActive: Optional[bool] = None
+
 class CoachAuth(BaseModel):
     email: str
     password: str
