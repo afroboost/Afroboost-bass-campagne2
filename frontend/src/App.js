@@ -1919,6 +1919,7 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [showCoachLogin, setShowCoachLogin] = useState(false);
   const [coachMode, setCoachMode] = useState(false);
+  const [coachUser, setCoachUser] = useState(null); // Utilisateur connecté via Google OAuth
   const [validationCode, setValidationCode] = useState(null); // For /validate/:code URL
 
   const [courses, setCourses] = useState([]);
