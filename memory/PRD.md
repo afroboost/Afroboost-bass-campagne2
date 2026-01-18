@@ -522,12 +522,20 @@ Application de réservation de casques audio pour des cours de fitness Afroboost
 - [x] **Authentification Google OAuth pour Super Admin (18 Jan 2026)**:
   - **Remplacement complet** : L'authentification par mot de passe a été supprimée
   - **Bouton Google officiel** : "Se connecter avec Google" avec icône multicolore
-  - **Restriction email** : Seul `coach@afroboost.com` peut accéder (variable `AUTHORIZED_COACH_EMAIL`)
+  - **Restriction email** : ~~`coach@afroboost.com`~~ → **`contact.artboost@gmail.com`** (mis à jour)
   - **Message "Accès réservé"** : Si autre email tente de se connecter
   - **Endpoints backend** : `/api/auth/google/session`, `/api/auth/me`, `/api/auth/logout`
   - **Session sécurisée** : Cookie httpOnly avec expiration 7 jours
   - **Collections MongoDB** : `google_users`, `coach_sessions`
   - **Affichage utilisateur** : Avatar et email affichés dans le header du Dashboard
+- [x] **Gestion Audio/Playlist pour les Cours (18 Jan 2026)**:
+  - **Bouton 🎵** : "Gérer l'Audio" visible à côté de chaque cours (onglet "Cours")
+  - **Modal playlist** : Ajouter/supprimer des URLs audio (MP3, streams, Soundcloud, Spotify)
+  - **Modèle Course** : Champ `playlist: Optional[List[str]]` ajouté
+  - **PUT partiel** : `/api/courses/{id}` supporte les mises à jour partielles
+  - **Sauvegarde** : Playlist liée à l'ID du cours et persistée en MongoDB
+  - **Tests** : 10/10 backend pytest passés
+  - **Onglets inchangés** : Paiements et Réservations non modifiés
 
 ### P1 - À faire
 - [x] ~~**CRITICAL: Refactoring de App.js**~~ - ✅ COMPLÉTÉ - App.js réduit de 52%
