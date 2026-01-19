@@ -2397,10 +2397,28 @@ function App() {
 
       if (cachedConcept) {
         setConcept(cachedConcept);
+        // Appliquer les couleurs personnalisées
+        if (cachedConcept.primaryColor) {
+          document.documentElement.style.setProperty('--primary-color', cachedConcept.primaryColor);
+          document.documentElement.style.setProperty('--glow-color', `${cachedConcept.primaryColor}66`);
+          document.documentElement.style.setProperty('--glow-color-strong', `${cachedConcept.primaryColor}99`);
+        }
+        if (cachedConcept.secondaryColor) {
+          document.documentElement.style.setProperty('--secondary-color', cachedConcept.secondaryColor);
+        }
       } else if (requestMap.concept !== undefined) {
         const conceptData = responses[requestMap.concept].data;
         cacheRef.current.concept = { data: conceptData, timestamp: now };
         setConcept(conceptData);
+        // Appliquer les couleurs personnalisées
+        if (conceptData.primaryColor) {
+          document.documentElement.style.setProperty('--primary-color', conceptData.primaryColor);
+          document.documentElement.style.setProperty('--glow-color', `${conceptData.primaryColor}66`);
+          document.documentElement.style.setProperty('--glow-color-strong', `${conceptData.primaryColor}99`);
+        }
+        if (conceptData.secondaryColor) {
+          document.documentElement.style.setProperty('--secondary-color', conceptData.secondaryColor);
+        }
       }
 
       // Données dynamiques (toujours rafraîchies)
