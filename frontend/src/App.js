@@ -3166,7 +3166,14 @@ function App() {
       )}
 
       {showConfirmPayment && <ConfirmPaymentOverlay t={t} onConfirm={confirmPayment} onCancel={() => { setShowConfirmPayment(false); setPendingReservation(null); }} />}
-      {showSuccess && lastReservation && <SuccessOverlay t={t} data={lastReservation} onClose={() => setShowSuccess(false)} />}
+      {showSuccess && lastReservation && (
+        <SuccessOverlay 
+          t={t} 
+          data={lastReservation} 
+          onClose={() => setShowSuccess(false)} 
+          onClearTicket={clearSavedTicket}
+        />
+      )}
       
       {/* Page de succès paiement Stripe (plein écran) */}
       {showPaymentSuccessPage && lastReservation && (
