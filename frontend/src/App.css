@@ -1,5 +1,28 @@
 /* Afroboost App Styles - Dark Neon Theme v4 */
 
+/* ========== VARIABLES CSS PERSONNALISABLES ========== */
+:root {
+  /* Couleurs principales - modifiables par le coach */
+  --primary-color: #D91CD2;        /* Rose/Magenta par défaut */
+  --secondary-color: #8b5cf6;      /* Violet */
+  --glow-color: rgba(217, 28, 210, 0.4);
+  --glow-color-strong: rgba(217, 28, 210, 0.6);
+  --accent-color: #10b981;         /* Vert pour succès */
+  
+  /* Couleurs dérivées (calculées à partir de primary) */
+  --primary-light: color-mix(in srgb, var(--primary-color) 70%, white);
+  --primary-dark: color-mix(in srgb, var(--primary-color) 70%, black);
+  
+  /* Background */
+  --bg-dark: #0a0015;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -13,10 +36,10 @@
   display: none;  /* Chrome, Safari, Opera */
 }
 
-/* Custom scrollbar for admin panels and sessions list - Rose (#D91CD2), 4px width */
+/* Custom scrollbar for admin panels and sessions list - utilise la variable */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #D91CD2 rgba(0, 0, 0, 0.2);
+  scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.2);
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
