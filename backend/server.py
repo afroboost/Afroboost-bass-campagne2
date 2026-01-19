@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # Stripe configuration - utilise la variable d'environnement existante
-stripe.api_key = os.environ.get('STRIPE_API_KEY')
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 
 # MongoDB connection - with fallback for production environments
 mongo_url = os.environ.get('MONGO_URL')
