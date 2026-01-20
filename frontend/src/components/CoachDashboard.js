@@ -4112,7 +4112,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                     />
                     <button 
                       type="button"
-                      onClick={handleTestWhatsApp}
+                      onClick={(e) => handleTestWhatsApp(e)}
                       disabled={testWhatsAppStatus === 'sending' || !whatsAppConfig.accountSid}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         testWhatsAppStatus === 'success' ? 'bg-green-600' :
@@ -4120,6 +4120,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                         testWhatsAppStatus === 'sending' ? 'bg-yellow-600' :
                         'bg-purple-600 hover:bg-purple-700'
                       } text-white disabled:opacity-50`}
+                      data-testid="test-whatsapp-btn"
                     >
                       {testWhatsAppStatus === 'sending' ? '⏳...' :
                        testWhatsAppStatus === 'success' ? '✅ Envoyé!' :
