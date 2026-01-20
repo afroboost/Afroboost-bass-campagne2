@@ -31,6 +31,128 @@ const EMAILJS_SERVICE_ID = "service_8mrmxim";
 const EMAILJS_TEMPLATE_ID = "template_3n1u86p";
 const EMAILJS_PUBLIC_KEY = "5LfgQSIEQoqq_XSqt";
 
+// === INITIALISATION SDK EMAILJS AU CHARGEMENT DU MODULE ===
+// Exécuté une seule fois au chargement du fichier, avant tout rendu React
+try {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+  console.log('✅ EmailJS SDK initialisé au chargement du module');
+} catch (initError) {
+  console.error('❌ Erreur initialisation EmailJS:', initError);
+}
+
+// ============================================================
+// === FONCTIONS AUTONOMES - ISOLÉES DE LA GESTION D'ÉTAT ===
+// ============================================================
+
+/**
+ * FONCTION AUTONOME D'ENVOI EMAIL
+ * Séparée de React pour éviter les conflits avec PostHog/state
+ * @param {string} destination - Email du destinataire
+ * @param {string} recipientName - Nom du destinataire
+ * @param {string} subject - Sujet de l'email
+ * @param {string} text - Corps du message
+ * @returns {Promise<{success: boolean, response?: any, error?: string}>}
+ */
+const performEmailSend = async (destination, recipientName = 'Client', subject = 'Afroboost', text = '') => {
+  // Objet ultra-simple - aucune référence complexe
+  const params = {
+    to_email: destination,
+    to_name: recipientName,
+    subject: subject,
+    message: text
+  };
+  
+  console.log('========================================');
+  console.log('DEMANDE EMAILJS ENVOYÉE');
+  console.log('Destination:', destination);
+  console.log('Params:', JSON.stringify(params));
+  console.log('Service:', EMAILJS_SERVICE_ID);
+  console.log('Template:', EMAILJS_TEMPLATE_ID);
+  console.log('========================================');
+  
+  try {
+    const response = await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      params,
+      EMAILJS_PUBLIC_KEY
+    );
+    
+    console.log('✅ EMAILJS RÉPONSE:', response);
+    return { success: true, response };
+  } catch (error) {
+    console.error('❌ EMAILJS ERREUR:', error);
+    return { success: false, error: error?.text || error?.message || 'Erreur inconnue' };
+  }
+};
+
+/**
+ * FONCTION AUTONOME D'ENVOI WHATSAPP VIA TWILIO
+ * Si pas de backend, affiche une alerte de simulation
+ * @param {string} phoneNumber - Numéro de téléphone
+ * @param {string} message - Message à envoyer
+ * @param {object} twilioConfig - {accountSid, authToken, fromNumber}
+ * @returns {Promise<{success: boolean, sid?: string, error?: string}>}
+ */
+const performWhatsAppSend = async (phoneNumber, message, twilioConfig) => {
+  const { accountSid, authToken, fromNumber } = twilioConfig || {};
+  
+  console.log('========================================');
+  console.log('DEMANDE WHATSAPP/TWILIO ENVOYÉE');
+  console.log('Numéro:', phoneNumber);
+  console.log('Message:', message?.substring(0, 50) + '...');
+  console.log('Account SID:', accountSid || 'NON CONFIGURÉ');
+  console.log('From Number:', fromNumber || 'NON CONFIGURÉ');
+  console.log('========================================');
+  
+  // Si pas de config Twilio, simulation avec alerte
+  if (!accountSid || !authToken || !fromNumber) {
+    console.warn('⚠️ Twilio non configuré - Mode simulation');
+    alert(`WhatsApp prêt pour : ${phoneNumber}\n\nMessage: ${message?.substring(0, 100)}...`);
+    return { success: true, simulated: true };
+  }
+  
+  // Formater le numéro au format E.164
+  let formattedPhone = phoneNumber.replace(/[^\d+]/g, '');
+  if (!formattedPhone.startsWith('+')) {
+    formattedPhone = formattedPhone.startsWith('0') 
+      ? '+41' + formattedPhone.substring(1) 
+      : '+' + formattedPhone;
+  }
+  
+  // Construire les données pour Twilio
+  const formData = new URLSearchParams();
+  formData.append('From', `whatsapp:${fromNumber.startsWith('+') ? fromNumber : '+' + fromNumber}`);
+  formData.append('To', `whatsapp:${formattedPhone}`);
+  formData.append('Body', message);
+  
+  try {
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      }
+    );
+    
+    const data = await response.json();
+    console.log('📱 TWILIO RÉPONSE:', data);
+    
+    if (!response.ok) {
+      return { success: false, error: data.message || `HTTP ${response.status}` };
+    }
+    
+    return { success: true, sid: data.sid };
+  } catch (error) {
+    console.error('❌ TWILIO ERREUR:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
