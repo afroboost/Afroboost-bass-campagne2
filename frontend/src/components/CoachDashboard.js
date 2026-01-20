@@ -31,73 +31,57 @@ const EMAILJS_SERVICE_ID = "service_8mrmxim";
 const EMAILJS_TEMPLATE_ID = "template_3n1u86p";
 const EMAILJS_PUBLIC_KEY = "5LfgQSIEQoqq_XSqt";
 
-// === 1. INITIALISATION DIRECTE AU CHARGEMENT DU MODULE ===
+// === 1. FORCE INIT - TOUT EN HAUT DU FICHIER ===
 emailjs.init("5LfgQSIEQoqq_XSqt");
-console.log("EMAILJS: SDK INITIALISÉ - PRÊT POUR ENVOI DIRECT");
 
-// === 2. BYPASS BACKEND - ENVOI DIRECT DEPUIS LE NAVIGATEUR ===
-// Cette fonction n'utilise PAS le backend Python
-// Elle envoie directement via l'API EmailJS depuis le navigateur
-const envoyerEmailDirect = async (emailDestinataire, texteIA) => {
+// === 2. ENVOI DIRECT - DEPUIS LE CLIENT ===
+const envoyerEmailDirect = async (email, messageIA) => {
   
-  // Vérification des paramètres
-  if (!emailDestinataire || !emailDestinataire.includes('@')) {
-    console.error("EMAILJS: EMAIL INVALIDE:", emailDestinataire);
-    window.alert("ERREUR: Email invalide - " + emailDestinataire);
+  console.log(">>> DEBUT ENVOI DIRECT");
+  console.log(">>> Email:", email);
+  console.log(">>> Message:", messageIA);
+  
+  // Vérif email
+  if (!email || !email.includes('@')) {
+    window.alert("ERREUR: Email invalide");
     return false;
   }
   
-  if (!texteIA || texteIA.trim() === '') {
-    console.error("EMAILJS: MESSAGE VIDE");
-    window.alert("ERREUR: Le message IA est vide");
+  // Vérif message
+  if (!messageIA || messageIA.trim() === '') {
+    window.alert("ERREUR: Message vide");
     return false;
   }
   
-  // === 3. SOUDURE IA - Le texte du Prompt Système va dans 'message' ===
-  const templateParams = {
-    to_email: emailDestinataire,
-    message: texteIA  // ← TEXTE GÉNÉRÉ PAR L'AGENT IA
+  // === 3. SOUDURE IA - Variable 'message' = texte de l'Agent IA ===
+  const params = {
+    to_email: email,
+    message: messageIA
   };
   
-  console.log("===========================================");
-  console.log("EMAILJS: ENVOI DIRECT DEPUIS LE NAVIGATEUR");
-  console.log("EMAILJS: Destinataire =", templateParams.to_email);
-  console.log("EMAILJS: Message IA =", templateParams.message.substring(0, 100) + "...");
-  console.log("EMAILJS: (Pas de requête backend - envoi direct)");
-  console.log("===========================================");
+  console.log(">>> Params:", JSON.stringify(params));
   
-  // ENVOI DIRECT - Pas de backend, pas d'API Python
   try {
-    const response = await emailjs.send(
-      "service_8mrmxim",
-      "template_3n1u86p",
-      templateParams,
-      "5LfgQSIEQoqq_XSqt"
-    );
+    const r = await emailjs.send("service_8mrmxim", "template_3n1u86p", params, "5LfgQSIEQoqq_XSqt");
     
-    console.log("EMAILJS: SUCCÈS - Status =", response.status);
-    console.log("EMAILJS: Response =", response);
+    console.log(">>> REPONSE:", r);
     
-    // === 4. TEST DE SORTIE - ALERTE DE SUCCÈS ===
-    window.alert("SUCCÈS : L'IA a envoyé l'email directement !");
-    
+    // === 4. ALERTE DE SUCCÈS ===
+    window.alert("L'IA A ENVOYÉ L'EMAIL EN DIRECT !");
     return true;
     
-  } catch (erreur) {
-    console.error("EMAILJS: ERREUR CATCH");
-    console.error("EMAILJS: Type =", erreur?.name);
-    console.error("EMAILJS: Text =", erreur?.text);
-    console.error("EMAILJS: Message =", erreur?.message);
+  } catch (e) {
+    console.error(">>> ERREUR:", e);
+    console.error(">>> e.text:", e?.text);
+    console.error(">>> e.message:", e?.message);
     
-    // Si c'est PostHog qui crash, on ignore
-    if (erreur?.name === 'DataCloneError') {
-      console.log("EMAILJS: Erreur PostHog ignorée");
-      window.alert("SUCCÈS : L'IA a envoyé l'email directement ! (tracking ignoré)");
+    // Ignorer PostHog
+    if (e?.name === 'DataCloneError') {
+      window.alert("L'IA A ENVOYÉ L'EMAIL EN DIRECT ! (tracking ignoré)");
       return true;
     }
     
-    // Afficher l'erreur réelle
-    window.alert("ERREUR EMAILJS: " + (erreur?.text || erreur?.message || "Inconnue"));
+    window.alert("ERREUR: " + (e?.text || e?.message || String(e)));
     return false;
   }
 };
