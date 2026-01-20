@@ -1,0 +1,73 @@
+{
+  "summary": "Verified all 10 surgical corrections for separating technical sending from state management. All 25 tests passed. Confirmed: 1) performEmailSend defined at module level (line 56, before CoachDashboard at line 268), 2) performWhatsAppSend defined at module level (line 97), 3) emailjs.init() called at module load (line 37) in try/catch, 4) performEmailSend has console.log('DEMANDE EMAILJS ENVOYÉE'), 5) handleTestEmailJS uses performEmailSend, 6) handleTestWhatsApp uses performWhatsAppSend, 7) launchCampaignWithSend uses both autonomous functions, 8) All handlers have e.preventDefault() and e.stopPropagation() FIRST, 9) Nested try/catch blocks isolate PostHog errors, 10) performWhatsAppSend has simulation mode with alert().",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Hero section",
+        "issues": ["YouTube video shows 'Video unavailable' - known issue from previous iterations"]
+      }
+    ]
+  },
+  "passed_tests": [
+    "performEmailSend defined at module level (line 56, before CoachDashboard at line 268)",
+    "performWhatsAppSend defined at module level (line 97, before CoachDashboard)",
+    "emailjs.init(EMAILJS_PUBLIC_KEY) called at module load (line 37)",
+    "emailjs.init() wrapped in try/catch block",
+    "performEmailSend has console.log('DEMANDE EMAILJS ENVOYÉE')",
+    "performEmailSend calls emailjs.send()",
+    "performEmailSend returns {success: boolean, response/error}",
+    "performWhatsAppSend has simulation mode with alert()",
+    "performWhatsAppSend checks Twilio config (!accountSid || !authToken || !fromNumber)",
+    "performWhatsAppSend returns {success: true, simulated: true} in simulation mode",
+    "handleTestEmailJS uses performEmailSend",
+    "handleTestWhatsApp uses performWhatsAppSend",
+    "launchCampaignWithSend uses both performEmailSend and performWhatsAppSend",
+    "handleTestEmailJS has e.preventDefault() and e.stopPropagation() FIRST",
+    "handleTestWhatsApp has e.preventDefault() and e.stopPropagation() FIRST",
+    "launchCampaignWithSend has e.preventDefault() and e.stopPropagation() FIRST",
+    "handleTestEmailJS has nested try/catch for PostHog isolation",
+    "handleTestWhatsApp has nested try/catch for PostHog isolation",
+    "launchCampaignWithSend has nested try/catch for PostHog isolation",
+    "Health endpoint returns 200 with healthy status",
+    "Campaigns endpoint returns list",
+    "WhatsApp config endpoint returns correct structure",
+    "EMAILJS_SERVICE_ID = 'service_8mrmxim'",
+    "EMAILJS_TEMPLATE_ID = 'template_3n1u86p'",
+    "EMAILJS_PUBLIC_KEY = '5LfgQSIEQoqq_XSqt'"
+  ],
+  "test_report_links": [
+    "/app/tests/test_autonomous_functions.py",
+    "/app/test_reports/pytest/pytest_autonomous_functions.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "✅ performEmailSend and performWhatsAppSend are correctly defined at MODULE LEVEL (outside React component) to avoid PostHog/state conflicts",
+    "✅ emailjs.init() is called at module load (line 37) ensuring SDK is ready before any component renders",
+    "✅ All handlers (handleTestEmailJS, handleTestWhatsApp, launchCampaignWithSend) have e.preventDefault() and e.stopPropagation() as FIRST lines",
+    "✅ Nested try/catch blocks properly isolate: 1) setState operations, 2) technical sending, 3) UI updates - so PostHog crashes don't block email/WhatsApp sending",
+    "✅ performWhatsAppSend has simulation mode: if Twilio not configured, shows alert() instead of crashing",
+    "✅ performEmailSend has clear logging with 'DEMANDE EMAILJS ENVOYÉE' for debugging"
+  ],
+  "updated_files": [
+    "/app/tests/test_autonomous_functions.py (new test file)"
+  ],
+  "success_rate": {
+    "backend": "100% (3/3 API tests passed)",
+    "frontend": "100% (22/22 code implementation tests passed)"
+  },
+  "test_credentials": {
+    "emailjs_service_id": "service_8mrmxim",
+    "emailjs_template_id": "template_3n1u86p",
+    "emailjs_public_key": "5LfgQSIEQoqq_XSqt"
+  },
+  "seed_data_creation": "None - static code analysis and API tests only",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All surgical corrections verified: 1) performEmailSend at line 56 (module level), 2) performWhatsAppSend at line 97 (module level), 3) emailjs.init() at line 37 (module load), 4) 'DEMANDE EMAILJS ENVOYÉE' log present, 5) handleTestEmailJS (lines 1541-1598) uses performEmailSend, 6) handleTestWhatsApp (lines 1765-1833) uses performWhatsAppSend, 7) launchCampaignWithSend (lines 1180-1345) uses both functions, 8) All handlers have e.preventDefault()/e.stopPropagation() FIRST, 9) Nested try/catch for PostHog isolation, 10) Simulation mode with alert() in performWhatsAppSend. Note: Coach dashboard requires Google OAuth with contact.artboost@gmail.com - cannot be tested via Playwright automation."
+}
