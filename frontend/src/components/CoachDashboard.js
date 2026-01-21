@@ -3,7 +3,7 @@
  * Admin panel for managing the Afroboost application
  * Extracted from App.js for better maintainability
  */
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import axios from "axios";
 import { QRCodeSVG } from "qrcode.react";
 import emailjs from '@emailjs/browser';
@@ -25,6 +25,7 @@ import {
   setLastMediaUrl as setLastMediaUrlService
 } from "../services/aiResponseService";
 import { LandingSectionSelector } from "./SearchBar";
+import { playNotificationSound, linkifyText } from "../services/notificationService";
 
 // === 1. FORCE INITIALISATION EMAILJS - AU MONTAGE ===
 emailjs.init("5LfgQSIEQoqq_XSqt");
