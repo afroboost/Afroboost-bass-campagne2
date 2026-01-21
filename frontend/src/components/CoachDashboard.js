@@ -5778,22 +5778,43 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                       return (
                         <div
                           key={session.id}
-                          onClick={() => {
-                            setSelectedSession(session);
-                            loadSessionMessages(session.id);
-                          }}
-                          className={`p-3 rounded-lg cursor-pointer transition-all ${isSelected ? 'ring-2 ring-purple-500' : 'hover:bg-white/5'}`}
+                          className={`p-3 rounded-lg transition-all ${isSelected ? 'ring-2 ring-purple-500' : 'hover:bg-white/5'}`}
                           style={{ background: isSelected ? 'rgba(139, 92, 246, 0.2)' : 'rgba(0,0,0,0.3)' }}
                           data-testid={`session-${session.id}`}
                         >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-white text-sm font-medium truncate">{participantNames}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${session.is_ai_active ? 'bg-green-600/30 text-green-400' : 'bg-yellow-600/30 text-yellow-400'}`}>
-                              {session.is_ai_active ? '🤖 IA' : '👤 Humain'}
-                            </span>
+                          <div 
+                            onClick={() => {
+                              setSelectedSession(session);
+                              loadSessionMessages(session.id);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-white text-sm font-medium truncate">{participantNames}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                session.mode === 'community' ? 'bg-purple-600/30 text-purple-400' :
+                                session.is_ai_active ? 'bg-green-600/30 text-green-400' : 'bg-yellow-600/30 text-yellow-400'
+                              }`}>
+                                {session.mode === 'community' ? '👥' : session.is_ai_active ? '🤖' : '👤'}
+                              </span>
+                            </div>
+                            <div className="text-white/50 text-xs">
+                              {session.title || getSourceLabel(chatParticipants.find(p => p.id === session.participant_ids?.[0])?.source)}
+                            </div>
                           </div>
-                          <div className="text-white/50 text-xs">
-                            {session.title || getSourceLabel(chatParticipants.find(p => p.id === session.participant_ids?.[0])?.source)}
+                          {/* Bouton suppression */}
+                          <div className="flex justify-end mt-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteChatSession(session.id);
+                              }}
+                              className="px-2 py-1 rounded text-xs transition-all hover:bg-red-600/30"
+                              style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}
+                              title="Supprimer la conversation"
+                            >
+                              🗑️ Supprimer
+                            </button>
                           </div>
                         </div>
                       );
