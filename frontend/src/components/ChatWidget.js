@@ -506,6 +506,18 @@ export const ChatWidget = () => {
         }]);
       }
       
+      // === PROMPT NOTIFICATIONS PUSH après le premier message ===
+      if (messageCount === 1 && participantId && !pushEnabled) {
+        // Attendre un peu avant de demander (non intrusif)
+        setTimeout(async () => {
+          const result = await promptForNotifications(participantId);
+          if (result.subscribed) {
+            setPushEnabled(true);
+            console.log('✅ Push notifications enabled');
+          }
+        }, 2000);
+      }
+      
     } catch (err) {
       console.error('Chat error:', err);
       setMessages(prev => [...prev, { 
