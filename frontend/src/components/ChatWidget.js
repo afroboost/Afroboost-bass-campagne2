@@ -1,5 +1,5 @@
-// /components/ChatWidget.js - Widget IA flottant avec capture de leads
-// Architecture modulaire Afroboost
+// /components/ChatWidget.js - Widget IA flottant avec capture de leads et reconnaissance automatique
+// Architecture modulaire Afroboost - Utilise l'API chat améliorée
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
@@ -8,6 +8,7 @@ const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 // Clé localStorage pour la mémorisation client
 const CHAT_CLIENT_KEY = 'af_chat_client';
+const CHAT_SESSION_KEY = 'af_chat_session';
 
 // Icône WhatsApp SVG
 const WhatsAppIcon = () => (
@@ -31,7 +32,8 @@ const SendIcon = () => (
 );
 
 /**
- * Widget de chat IA flottant avec capture de leads et mémorisation client
+ * Widget de chat IA flottant avec reconnaissance automatique et historique
+ * Utilise l'API /api/chat/smart-entry pour identifier les utilisateurs
  */
 export const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,24 +44,51 @@ export const ChatWidget = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isReturningClient, setIsReturningClient] = useState(false);
+  const [sessionData, setSessionData] = useState(null);
+  const [participantId, setParticipantId] = useState(null);
   const messagesEndRef = useRef(null);
+
+  // Extraire le token de lien depuis l'URL si présent
+  const getLinkTokenFromUrl = () => {
+    const path = window.location.pathname;
+    const match = path.match(/\/chat\/([a-zA-Z0-9-]+)/);
+    return match ? match[1] : null;
+  };
 
   // === MÉMORISATION CLIENT: Charger les données au démarrage ===
   useEffect(() => {
     const savedClient = localStorage.getItem(CHAT_CLIENT_KEY);
+    const savedSession = localStorage.getItem(CHAT_SESSION_KEY);
+    
     if (savedClient) {
       try {
         const clientData = JSON.parse(savedClient);
         if (clientData.firstName && clientData.email) {
           setLeadData(clientData);
           setIsReturningClient(true);
-          // Préparer le message d'accueil personnalisé
+          if (clientData.participantId) {
+            setParticipantId(clientData.participantId);
+          }
           console.log(`🎉 Client reconnu: ${clientData.firstName}`);
         }
       } catch (err) {
         console.error('Error loading saved client:', err);
         localStorage.removeItem(CHAT_CLIENT_KEY);
       }
+    }
+
+    if (savedSession) {
+      try {
+        setSessionData(JSON.parse(savedSession));
+      } catch (err) {
+        localStorage.removeItem(CHAT_SESSION_KEY);
+      }
+    }
+
+    // Si on arrive via un lien partagé, ouvrir automatiquement le widget
+    const linkToken = getLinkTokenFromUrl();
+    if (linkToken) {
+      setIsOpen(true);
     }
   }, []);
 
@@ -70,35 +99,59 @@ export const ChatWidget = () => {
     }
   }, [messages]);
 
-  // === SYNCHRONISATION CONTACTS: Créer ou mettre à jour le contact en base ===
-  const syncContactToDatabase = async (clientData) => {
+  // === SMART ENTRY: Point d'entrée intelligent avec reconnaissance ===
+  const handleSmartEntry = async (clientData, linkToken = null) => {
     try {
-      // Vérifier si le contact existe déjà par email
-      const usersResponse = await axios.get(`${API}/users`);
-      const existingUser = usersResponse.data.find(
-        u => u.email?.toLowerCase() === clientData.email.toLowerCase()
-      );
+      const response = await axios.post(`${API}/chat/smart-entry`, {
+        name: clientData.firstName,
+        email: clientData.email,
+        whatsapp: clientData.whatsapp,
+        link_token: linkToken
+      });
 
-      if (existingUser) {
-        // Mettre à jour le contact existant (nom et whatsapp peuvent avoir changé)
-        await axios.put(`${API}/users/${existingUser.id}`, {
-          name: clientData.firstName,
-          email: clientData.email,
-          whatsapp: clientData.whatsapp
-        });
-        console.log(`✅ Contact mis à jour: ${clientData.firstName}`);
+      const { participant, session, is_returning, chat_history, message } = response.data;
+
+      // Sauvegarder les données
+      const fullClientData = {
+        ...clientData,
+        participantId: participant.id
+      };
+      localStorage.setItem(CHAT_CLIENT_KEY, JSON.stringify(fullClientData));
+      localStorage.setItem(CHAT_SESSION_KEY, JSON.stringify(session));
+
+      setParticipantId(participant.id);
+      setSessionData(session);
+      setIsReturningClient(is_returning);
+
+      // Restaurer l'historique si utilisateur reconnu
+      if (is_returning && chat_history && chat_history.length > 0) {
+        const restoredMessages = chat_history.map(msg => ({
+          type: msg.sender_type === 'user' ? 'user' : 'ai',
+          text: msg.content
+        }));
+        setMessages([
+          { type: 'ai', text: message },
+          ...restoredMessages
+        ]);
       } else {
-        // Créer un nouveau contact
-        await axios.post(`${API}/users`, {
-          name: clientData.firstName,
-          email: clientData.email,
-          whatsapp: clientData.whatsapp
-        });
-        console.log(`✅ Nouveau contact créé: ${clientData.firstName}`);
+        setMessages([{
+          type: 'ai',
+          text: message
+        }]);
       }
+
+      setStep('chat');
+      return { success: true, session, participant };
+
     } catch (err) {
-      console.error('Error syncing contact:', err);
-      // Ne pas bloquer le chat si la synchro échoue
+      console.error('Smart entry error:', err);
+      // Fallback: continuer sans le backend amélioré
+      setMessages([{
+        type: 'ai',
+        text: `Enchanté ${clientData.firstName} ! 👋 Comment puis-je t'aider ?`
+      }]);
+      setStep('chat');
+      return { success: false };
     }
   };
 
@@ -130,31 +183,25 @@ export const ChatWidget = () => {
         email: leadData.email.trim().toLowerCase()
       };
 
-      // === MÉMORISATION: Sauvegarder dans localStorage ===
-      localStorage.setItem(CHAT_CLIENT_KEY, JSON.stringify(clientData));
-      console.log(`💾 Client sauvegardé: ${clientData.firstName}`);
+      // Utiliser le smart entry pour la reconnaissance automatique
+      const linkToken = getLinkTokenFromUrl();
+      await handleSmartEntry(clientData, linkToken);
 
-      // === SYNCHRONISATION: Créer/Mettre à jour le contact en base ===
-      await syncContactToDatabase(clientData);
-      
-      // Enregistrer le lead dans MongoDB (collection leads)
-      await axios.post(`${API}/leads`, {
-        firstName: clientData.firstName,
-        whatsapp: clientData.whatsapp,
-        email: clientData.email,
-        source: 'widget_ia'
-      });
-      
-      // Passer en mode chat avec message d'accueil
-      setStep('chat');
-      setMessages([{
-        type: 'ai',
-        text: `Enchanté ${clientData.firstName} ! 👋 Je suis l'assistant IA d'Afroboost. Comment puis-je t'aider aujourd'hui ?`
-      }]);
+      // Backup: créer aussi un lead (ancien système)
+      try {
+        await axios.post(`${API}/leads`, {
+          firstName: clientData.firstName,
+          whatsapp: clientData.whatsapp,
+          email: clientData.email,
+          source: linkToken ? `link_${linkToken}` : 'widget_ia'
+        });
+      } catch (leadErr) {
+        console.warn('Lead creation failed, continuing anyway:', leadErr);
+      }
       
     } catch (err) {
-      console.error('Error saving lead:', err);
-      // Même en cas d'erreur, sauvegarder localement et passer en mode chat
+      console.error('Error:', err);
+      // Fallback
       localStorage.setItem(CHAT_CLIENT_KEY, JSON.stringify({
         firstName: leadData.firstName.trim(),
         whatsapp: leadData.whatsapp.trim(),
@@ -164,7 +211,7 @@ export const ChatWidget = () => {
       setStep('chat');
       setMessages([{
         type: 'ai',
-        text: `Enchanté ${leadData.firstName} ! 👋 Je suis l'assistant IA d'Afroboost. Comment puis-je t'aider aujourd'hui ?`
+        text: `Enchanté ${leadData.firstName} ! 👋 Comment puis-je t'aider ?`
       }]);
     } finally {
       setIsLoading(false);
@@ -176,15 +223,8 @@ export const ChatWidget = () => {
     setIsLoading(true);
     
     try {
-      // Synchroniser les données existantes avec la base
-      await syncContactToDatabase(leadData);
-      
-      // Passer directement en mode chat avec salutation personnalisée
-      setStep('chat');
-      setMessages([{
-        type: 'ai',
-        text: `Bonjour ${leadData.firstName} ! 😊 Ravi de te revoir ! Comment puis-je t'aider aujourd'hui ?`
-      }]);
+      const linkToken = getLinkTokenFromUrl();
+      await handleSmartEntry(leadData, linkToken);
     } catch (err) {
       console.error('Error:', err);
       setStep('chat');
@@ -207,7 +247,7 @@ export const ChatWidget = () => {
     }
   };
 
-  // Envoyer un message au chat
+  // Envoyer un message au chat avec contexte de session
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
     
@@ -217,16 +257,39 @@ export const ChatWidget = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(`${API}/chat`, {
-        message: userMessage,
-        firstName: leadData.firstName,
-        leadId: ''
-      });
-      
-      setMessages(prev => [...prev, { 
-        type: 'ai', 
-        text: response.data.response || "Désolé, je n'ai pas pu traiter votre message."
-      }]);
+      // Si on a une session active, utiliser l'API améliorée
+      if (sessionData && participantId) {
+        const response = await axios.post(`${API}/chat/ai-response`, {
+          session_id: sessionData.id,
+          participant_id: participantId,
+          message: userMessage
+        });
+        
+        if (response.data.response) {
+          setMessages(prev => [...prev, { 
+            type: 'ai', 
+            text: response.data.response
+          }]);
+        } else if (!response.data.ai_active) {
+          // IA désactivée - message en attente
+          setMessages(prev => [...prev, { 
+            type: 'ai', 
+            text: "Message reçu ! Le coach vous répondra bientôt. 💬"
+          }]);
+        }
+      } else {
+        // Fallback: ancien système
+        const response = await axios.post(`${API}/chat`, {
+          message: userMessage,
+          firstName: leadData.firstName,
+          leadId: ''
+        });
+        
+        setMessages(prev => [...prev, { 
+          type: 'ai', 
+          text: response.data.response || "Désolé, je n'ai pas pu traiter votre message."
+        }]);
+      }
       
     } catch (err) {
       console.error('Chat error:', err);
@@ -242,16 +305,18 @@ export const ChatWidget = () => {
   // Réinitialiser le widget
   const handleClose = () => {
     setIsOpen(false);
-    // Garder les données du lead pour ne pas les redemander
   };
 
   // Option pour changer d'identité (nouveau client)
   const handleChangeIdentity = () => {
     localStorage.removeItem(CHAT_CLIENT_KEY);
+    localStorage.removeItem(CHAT_SESSION_KEY);
     setLeadData({ firstName: '', whatsapp: '', email: '' });
     setIsReturningClient(false);
     setStep('form');
     setMessages([]);
+    setSessionData(null);
+    setParticipantId(null);
   };
 
   return (
@@ -262,12 +327,12 @@ export const ChatWidget = () => {
           onClick={handleOpenWidget}
           className="fixed z-50 shadow-lg transition-all duration-300 hover:scale-110"
           style={{
-            bottom: '80px', // Au-dessus du footer
+            bottom: '80px',
             right: '20px',
             width: '56px',
             height: '56px',
             borderRadius: '50%',
-            background: '#25D366', // Vert WhatsApp
+            background: '#25D366',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -312,7 +377,7 @@ export const ChatWidget = () => {
             right: '20px',
             width: '340px',
             maxWidth: 'calc(100vw - 40px)',
-            maxHeight: '80vh', // FIX: max-height 80vh
+            maxHeight: '80vh',
             borderRadius: '16px',
             background: '#0a0a0a',
             border: '1px solid rgba(217, 28, 210, 0.3)',
@@ -379,7 +444,7 @@ export const ChatWidget = () => {
             overflow: 'hidden', 
             display: 'flex', 
             flexDirection: 'column',
-            minHeight: 0 // Important pour le scroll
+            minHeight: 0
           }}>
             
             {/* Formulaire de capture avec scroll */}
@@ -387,7 +452,7 @@ export const ChatWidget = () => {
               <div 
                 style={{
                   flex: 1,
-                  overflowY: 'auto', // FIX: overflow-y auto
+                  overflowY: 'auto',
                   padding: '20px',
                   display: 'flex',
                   flexDirection: 'column'
