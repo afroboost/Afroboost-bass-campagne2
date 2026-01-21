@@ -479,7 +479,7 @@ export const ChatWidget = () => {
 
   return (
     <>
-      {/* Style pour les liens dans les messages */}
+      {/* Style pour les liens dans les messages et responsive mobile */}
       <style>{`
         .chat-link {
           color: #a78bfa;
@@ -489,13 +489,41 @@ export const ChatWidget = () => {
         .chat-link:hover {
           color: #c4b5fd;
         }
+        
+        /* Chat widget responsive - plus grand sur mobile */
+        @media (max-width: 640px) {
+          .chat-widget-window {
+            bottom: 0 !important;
+            right: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 85vh !important;
+            max-height: 85vh !important;
+            border-radius: 16px 16px 0 0 !important;
+          }
+          .chat-widget-button {
+            bottom: 20px !important;
+            right: 16px !important;
+            width: 60px !important;
+            height: 60px !important;
+          }
+        }
+        
+        @media (min-width: 641px) and (max-width: 1024px) {
+          .chat-widget-window {
+            width: 400px !important;
+            height: 70vh !important;
+            max-height: 70vh !important;
+          }
+        }
       `}</style>
 
       {/* Bouton flottant WhatsApp */}
       {!isOpen && (
         <button
           onClick={handleOpenWidget}
-          className="fixed z-50 shadow-lg transition-all duration-300 hover:scale-110"
+          className="chat-widget-button fixed z-50 shadow-lg transition-all duration-300 hover:scale-110"
           style={{
             bottom: '80px',
             right: '20px',
