@@ -3087,8 +3087,8 @@ async def upload_custom_emoji(request: Request):
     
     await db.custom_emojis.insert_one(emoji_obj)
     
-    # Retourner sans _id
-    del emoji_obj["_id"] if "_id" in emoji_obj else None
+    # Retourner sans _id (MongoDB l'ajoute automatiquement)
+    emoji_obj.pop("_id", None)
     return emoji_obj
 
 @api_router.delete("/chat/emojis/{emoji_id}")
