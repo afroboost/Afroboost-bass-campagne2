@@ -3325,6 +3325,68 @@ async def send_backup_email(participant_id: str, message_preview: str):
         logger.error(f"Backup email failed: {str(e)}")
         return False
 
+async def notify_coach_new_message(participant_name: str, message_preview: str, session_id: str):
+    """
+    Notifie le coach par e-mail quand un message arrive en mode humain.
+    Crucial pour ne pas rater de ventes.
+    """
+    # Récupérer l'email du coach depuis coach_auth
+    coach_auth = await db.coach_auth.find_one({}, {"_id": 0})
+    if not coach_auth or not coach_auth.get("email"):
+        logger.warning("Coach email not configured - cannot send notification")
+        return False
+    
+    coach_email = coach_auth.get("email")
+    
+    # Mode simulation si Resend non configuré
+    if not RESEND_AVAILABLE or not RESEND_API_KEY:
+        logger.info(f"[SIMULATION COACH EMAIL] To: {coach_email}")
+        logger.info(f"[SIMULATION COACH EMAIL] Subject: 🔔 Nouveau message de {participant_name}")
+        logger.info(f"[SIMULATION COACH EMAIL] Message: {message_preview[:100]}...")
+        logger.info(f"[SIMULATION COACH EMAIL] Session ID: {session_id}")
+        logger.info(f"[SIMULATION COACH EMAIL] Email would be sent successfully (Resend not configured)")
+        return True
+    
+    html_content = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #d91cd2, #8b5cf6); padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">🔔 Nouveau message !</h1>
+        </div>
+        <div style="background: #1a1a1a; padding: 30px; color: #ffffff; border-radius: 0 0 12px 12px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">
+                <strong>{participant_name}</strong> vous a envoyé un message :
+            </p>
+            <div style="background: rgba(139, 92, 246, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #8b5cf6;">
+                <p style="margin: 0; font-size: 14px; color: #ffffff;">
+                    "{message_preview[:200]}{'...' if len(message_preview) > 200 else ''}"
+                </p>
+            </div>
+            <p style="font-size: 12px; color: #aaaaaa; margin-bottom: 20px;">
+                Ce message nécessite votre réponse en mode humain.
+            </p>
+            <a href="https://afroboost.ch/coach" 
+               style="display: inline-block; background: linear-gradient(135deg, #d91cd2, #8b5cf6); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                Répondre maintenant
+            </a>
+        </div>
+    </div>
+    """
+    
+    try:
+        params = {
+            "from": "Afroboost <onboarding@resend.dev>",
+            "to": [coach_email],
+            "subject": f"🔔 Nouveau message de {participant_name}",
+            "html": html_content
+        }
+        
+        email_result = await asyncio.to_thread(resend.Emails.send, params)
+        logger.info(f"Coach notification email sent: {email_result}")
+        return True
+    except Exception as e:
+        logger.error(f"Coach notification email failed: {str(e)}")
+        return False
+
 @api_router.post("/push/send")
 async def send_push_to_participant(request: Request):
     """
