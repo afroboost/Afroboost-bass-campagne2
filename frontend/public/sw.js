@@ -1,62 +1,104 @@
-// Afroboost Service Worker for PWA support
-const CACHE_NAME = 'afroboost-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/logo192.png',
-  '/logo512.png',
-  '/favicon.ico'
-];
+// Service Worker pour les notifications push Afroboost
+// Ce fichier doit être à la racine du domaine (public/)
 
-// Install event - cache resources
+const CACHE_NAME = 'afroboost-v1';
+
+// Installation du Service Worker
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((err) => {
-        console.log('Cache install failed:', err);
-      })
-  );
+  console.log('[SW] Service Worker installé');
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activation
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
+  console.log('[SW] Service Worker activé');
+  event.waitUntil(clients.claim());
 });
 
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached response if found
-        if (response) {
-          return response;
+// Réception des notifications push
+self.addEventListener('push', (event) => {
+  console.log('[SW] Notification push reçue');
+  
+  let data = {
+    title: 'Afroboost',
+    body: 'Vous avez un nouveau message',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    data: {}
+  };
+  
+  if (event.data) {
+    try {
+      data = { ...data, ...event.data.json() };
+    } catch (e) {
+      console.error('[SW] Erreur parsing push data:', e);
+    }
+  }
+  
+  const options = {
+    body: data.body,
+    icon: data.icon || '/favicon.ico',
+    badge: data.badge || '/favicon.ico',
+    vibrate: [200, 100, 200], // Vibration pattern pour mobile
+    tag: 'afroboost-notification', // Groupe les notifications
+    renotify: true, // Notifie même si déjà une notification du même tag
+    requireInteraction: false, // Se ferme automatiquement
+    actions: [
+      {
+        action: 'open',
+        title: 'Ouvrir'
+      },
+      {
+        action: 'close',
+        title: 'Fermer'
+      }
+    ],
+    data: data.data
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Clic sur la notification
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Clic sur notification');
+  
+  event.notification.close();
+  
+  if (event.action === 'close') {
+    return;
+  }
+  
+  // Ouvrir l'application ou focus sur la fenêtre existante
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Si une fenêtre est déjà ouverte, la focus
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
+          }
         }
-        // Otherwise fetch from network
-        return fetch(event.request);
-      })
-      .catch(() => {
-        // If offline, return cached index for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+        // Sinon, ouvrir une nouvelle fenêtre
+        if (clients.openWindow) {
+          return clients.openWindow('/');
         }
       })
   );
+});
+
+// Fermeture de la notification
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification fermée');
+});
+
+// Message du client (pour future use)
+self.addEventListener('message', (event) => {
+  console.log('[SW] Message reçu:', event.data);
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
