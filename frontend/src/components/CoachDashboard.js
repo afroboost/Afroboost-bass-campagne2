@@ -1203,6 +1203,33 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
     }
   };
 
+  // Créer un chat communautaire (sans IA)
+  const createCommunityChat = async () => {
+    try {
+      const title = newLinkTitle.trim() || 'Chat Communauté Afroboost';
+      // Créer une session avec mode communauté
+      const sessionRes = await axios.post(`${API}/chat/sessions`, {
+        mode: 'community',
+        is_ai_active: false,
+        title: title
+      });
+      
+      // Mettre à jour les listes
+      setChatSessions(prev => [sessionRes.data, ...prev]);
+      setNewLinkTitle('');
+      
+      // Copier automatiquement le lien
+      if (sessionRes.data.link_token) {
+        copyLinkToClipboard(sessionRes.data.link_token);
+      }
+      
+      return sessionRes.data;
+    } catch (err) {
+      console.error("Error creating community chat:", err);
+      return null;
+    }
+  };
+
   const toggleSessionAI = async (sessionId) => {
     try {
       const res = await axios.post(`${API}/chat/sessions/${sessionId}/toggle-ai`);
@@ -1212,6 +1239,23 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
       }
     } catch (err) {
       console.error("Error toggling AI:", err);
+    }
+  };
+
+  // Changer le mode de la session (ai, human, community)
+  const setSessionMode = async (sessionId, mode) => {
+    try {
+      const isAiActive = mode === 'ai';
+      const res = await axios.put(`${API}/chat/sessions/${sessionId}`, {
+        mode: mode,
+        is_ai_active: isAiActive
+      });
+      setChatSessions(prev => prev.map(s => s.id === sessionId ? res.data : s));
+      if (selectedSession?.id === sessionId) {
+        setSelectedSession(res.data);
+      }
+    } catch (err) {
+      console.error("Error changing session mode:", err);
     }
   };
 
@@ -1264,6 +1308,50 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
     }
     return source === 'chat_afroboost' ? 'Widget Chat' : source;
   };
+
+  // === POLLING NOTIFICATIONS pour nouveaux messages ===
+  const lastMessageCountRef = useRef({});
+  
+  const checkNewMessages = useCallback(async () => {
+    if (tab !== 'conversations') return;
+    
+    // Vérifier les sessions en mode humain pour les nouveaux messages
+    const humanSessions = chatSessions.filter(s => !s.is_ai_active);
+    
+    for (const session of humanSessions) {
+      try {
+        const res = await axios.get(`${API}/chat/sessions/${session.id}/messages`);
+        const messages = res.data;
+        const prevCount = lastMessageCountRef.current[session.id] || 0;
+        
+        if (messages.length > prevCount) {
+          const latestMessage = messages[messages.length - 1];
+          
+          // Si le message vient d'un utilisateur (pas du coach)
+          if (latestMessage.sender_type === 'user') {
+            playNotificationSound('user');
+            
+            // Mettre à jour les messages si c'est la session sélectionnée
+            if (selectedSession?.id === session.id) {
+              setSessionMessages(messages);
+            }
+          }
+        }
+        
+        lastMessageCountRef.current[session.id] = messages.length;
+      } catch (err) {
+        // Ignorer les erreurs silencieusement
+      }
+    }
+  }, [tab, chatSessions, selectedSession]);
+
+  // Polling toutes les 5 secondes quand sur l'onglet conversations
+  useEffect(() => {
+    if (tab !== 'conversations') return;
+    
+    const interval = setInterval(checkNewMessages, 5000);
+    return () => clearInterval(interval);
+  }, [tab, checkNewMessages]);
 
   // Load conversations when tab changes
   useEffect(() => {
