@@ -2220,7 +2220,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
     { id: "reservations", label: t('reservations') }, { id: "concept", label: t('conceptVisual') },
     { id: "courses", label: t('courses') }, { id: "offers", label: t('offers') },
     { id: "payments", label: t('payments') }, { id: "codes", label: t('promoCodes') },
-    { id: "campaigns", label: "📢 Campagnes" }
+    { id: "campaigns", label: "📢 Campagnes" }, { id: "conversations", label: "💬 Conversations" }
   ];
 
   return (
