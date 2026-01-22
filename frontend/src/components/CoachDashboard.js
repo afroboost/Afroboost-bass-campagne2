@@ -6052,22 +6052,28 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                               data-testid="coach-message-input"
                             />
                             <button
-                              onClick={() => {
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 console.log('📤 Bouton envoi cliqué, message:', coachMessage);
-                                sendCoachMessage();
+                                if (coachMessage.trim()) {
+                                  sendCoachMessage();
+                                }
                               }}
                               disabled={!coachMessage.trim()}
-                              className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:scale-110 active:scale-95"
+                              className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500"
                               style={{ 
                                 background: coachMessage.trim() ? 'linear-gradient(135deg, #d91cd2, #8b5cf6)' : 'rgba(255,255,255,0.1)',
                                 color: '#fff',
                                 opacity: coachMessage.trim() ? 1 : 0.5,
                                 cursor: coachMessage.trim() ? 'pointer' : 'not-allowed',
                                 minWidth: '48px',
-                                minHeight: '40px'
+                                minHeight: '40px',
+                                boxShadow: coachMessage.trim() ? '0 0 15px rgba(217, 28, 210, 0.4)' : 'none'
                               }}
                               data-testid="send-coach-message-btn"
-                              title="Envoyer le message"
+                              title="Envoyer le message (ou appuyez sur Entrée)"
                             >
                               📤
                             </button>
