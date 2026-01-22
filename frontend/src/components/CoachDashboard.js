@@ -4503,7 +4503,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                   <button 
                     type="button"
                     onClick={(e) => handleBulkSendCampaign(e)}
-                    disabled={bulkSendingInProgress || (!isEmailJSConfigured() && !isWhatsAppConfigured())}
+                    disabled={bulkSendingInProgress}
                     className="w-full py-4 rounded-xl font-bold text-white text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       background: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 50%, #d91cd2 100%)',
@@ -4514,23 +4514,17 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                     {bulkSendingInProgress ? '⏳ Envoi en cours...' : '🚀 Envoyer Email + WhatsApp'}
                   </button>
                   <p className="text-xs text-white/50 text-center mt-2">
-                    Envoie automatiquement sur tous les canaux configurés
+                    Envoie via Resend (@afroboosteur.com) et WhatsApp
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   
-                  {/* === EMAIL AUTOMATIQUE (EmailJS) === */}
+                  {/* === EMAIL VIA RESEND === */}
                   <div className="p-4 rounded-xl bg-blue-900/20 border border-blue-500/30">
                     <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-                      📧 Email
-                      <button 
-                        type="button"
-                        onClick={() => setShowEmailJSConfig(!showEmailJSConfig)}
-                        className="ml-auto text-xs text-blue-400 hover:text-blue-300"
-                      >
-                        ⚙️ Config
-                      </button>
+                      📧 Email (Resend)
+                      <span className="ml-auto text-xs text-green-400">✓ Actif</span>
                     </h4>
                     
                     {/* Barre de progression */}
@@ -4573,11 +4567,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                     
                     <p className="text-xs text-white/60 mb-3">
                       {contactStats.withEmail} destinataire(s)
-                      {isEmailJSConfigured() ? (
-                        <span className="text-green-400 ml-1">✓ Configuré</span>
-                      ) : (
-                        <span className="text-yellow-400 ml-1">⚠️ Non configuré</span>
-                      )}
+                      <span className="text-green-400 ml-1">✓ Resend configuré</span>
                     </p>
                     
                     {contactStats.withEmail > 0 ? (
@@ -4585,7 +4575,7 @@ const CoachDashboard = ({ t, lang, onBack, onLogout, coachUser }) => {
                         <button 
                           type="button"
                           onClick={(e) => handleSendEmailCampaign(e)}
-                          disabled={emailSendingProgress !== null || !isEmailJSConfigured()}
+                          disabled={emailSendingProgress !== null}
                           className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-center font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           data-testid="send-email-campaign-btn"
                         >
