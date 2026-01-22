@@ -769,7 +769,7 @@ Les fonctions d'envoi sont maintenant **au niveau module** (hors React) pour év
    - Private Chat testé avec sessions existantes
    - Code review complet passé
 
-### Notifications Push & Coach (21 Jan 2026)
+### Notifications Push & Coach (22 Jan 2026 - FINALISÉ)
 1. ✅ **Web Push API (Notifications Navigateur)**:
    - Service Worker `/public/sw.js` pour recevoir et afficher les notifications
    - Service `pushNotificationService.js` pour gérer les souscriptions côté client
@@ -780,14 +780,25 @@ Les fonctions d'envoi sont maintenant **au niveau module** (hors React) pour év
    - Clés VAPID configurées dans backend/.env
    - Intégration avec `pywebpush` pour l'envoi serveur
 
-2. ✅ **Email via Resend (PRODUCTION - 22 Jan 2026)**:
+2. ✅ **Email via Resend (PRODUCTION)**:
    - Clé API Resend configurée dans backend/.env
    - Domaine vérifié: `afroboosteur.com`
    - Adresse d'expédition: `notifications@afroboosteur.com`
-   - **EmailJS supprimé** - Resend est le moteur unique d'envoi
+   - **EmailJS complètement supprimé** - Resend est le moteur unique d'envoi
    - Endpoint `/api/campaigns/send-email` pour les campagnes marketing
    - Fonction `send_backup_email()` pour backup notifications push
    - Template HTML stylisé avec branding Afroboost
+
+3. ✅ **Bouton Envoi Coach (CORRIGÉ)**:
+   - Fonction `handleSendMessage` avec auto-sélection de session
+   - Bug `user is not defined` corrigé → utilise `coachUser`
+   - Bouton violet avec icône 📤 et effet hover
+   - Rafraîchissement automatique des sessions (5 secondes)
+
+4. ✅ **Tests validés**:
+   - iteration_31: 14/14 backend tests (100%)
+   - Messages coach envoyés et vérifiés en MongoDB
+   - Frontend compile sans erreur
 
 3. ✅ **Notifications Coach (Mode Humain)**:
    - Fonction `notify_coach_new_message()` notifie le coach par email
