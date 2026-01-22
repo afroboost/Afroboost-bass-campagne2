@@ -2723,16 +2723,16 @@ function App() {
 
       const { coachEmail, coachPhone, message, subject } = notifyResponse.data;
 
-      // Envoyer notification email si configuré et EmailJS est actif
-      if (coachEmail && isEmailJSConfigured()) {
+      // Envoyer notification email via Resend (backend)
+      if (coachEmail) {
         try {
-          await sendEmail({
+          await axios.post(`${API}/campaigns/send-email`, {
             to_email: coachEmail,
             to_name: "Coach Afroboost",
             subject: subject,
             message: message
           });
-          console.log("✅ Email notification sent to coach");
+          console.log("✅ Email notification sent to coach via Resend");
         } catch (emailErr) {
           console.error("Email notification failed:", emailErr);
         }
